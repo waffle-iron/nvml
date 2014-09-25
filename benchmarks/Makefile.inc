@@ -37,15 +37,15 @@
 LIBS =
 INCS =
 DEFS =
-CFLAGS = -std=gnu99 -Wall -Werror -O3
+CFLAGS = -Wall -O3
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $(OBJS) $(LIBS)
+	$(CXX) -o $@ $(OBJS) $(LIBS)
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $(INCS) $(DEFS) $< -o $@
+	$(CXX) -c $(CFLAGS) $(INCS) $(DEFS) $< -o $@
 
 clean:
 	$(RM) *.o */*.o *.out *.png

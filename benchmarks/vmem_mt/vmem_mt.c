@@ -41,6 +41,7 @@
 #include <argp.h>
 #include <sys/stat.h>
 #include "tasks.h"
+#include "cpucounters.h"
 
 #define	MAX_THREADS 8
 #define	KB 1024
@@ -134,7 +135,7 @@ char *allocation_size_str = NULL;
 static error_t
 parse_opt(int key, char *arg, struct argp_state *state)
 {
-	arguments_t *arguments = state->input;
+	arguments_t *arguments = static_cast<arguments_t*>(state->input);
 	char *endptr;
 	int i;
 	struct stat dir_stat;
@@ -163,7 +164,7 @@ parse_opt(int key, char *arg, struct argp_state *state)
 		for (i = 0; i < MAX_ALLOCATOR; ++i) {
 			if (strncmp(arg, allocator_names[i],
 				ALLOCATOR_NAME_MAX_LEN) == 0) {
-				arguments->allocator = i;
+				arguments->allocator = static_cast<allocator_t>(i);
 				break;
 			}
 		}
@@ -262,7 +263,7 @@ main(int argc, char *argv[])
 			arguments.thread_count : 1;
 	VMEM *pools[pools_count];
 	void *pools_data[pools_count];
-	allocated_mem = calloc(arguments.ops_count, sizeof (void*));
+	allocated_mem = static_cast<void**>(calloc(arguments.ops_count, sizeof (void*)));
 
 	if (allocated_mem == NULL) {
 		perror("calloc");
@@ -319,6 +320,16 @@ main(int argc, char *argv[])
 		fails += run_threads(&arguments, tasks[i],
 			per_thread_args, arg, &task_duration);
 	}
+	PCM *m = PCM::getInstance();
+
+	int error_code;
+	if ((error_code = m->program()) != PCM::Success) {
+		m->cleanup();
+		printf("m->program failed with error %d\n", error_code);
+		return -1;
+	}
+
+	SystemCounterState before_sstate = getSystemCounterState();
 
 	for (i = 0; i < MAX_TASK; ++i) {
 		fails += run_threads(&arguments, tasks[i],
@@ -327,7 +338,15 @@ main(int argc, char *argv[])
 			task_duration, arguments.ops_count/task_duration);
 	}
 
+	SystemCounterState after_sstate = getSystemCounterState();
+
 	printf("\n");
+
+	printf("Cycles lost on L3miss %f\n", getCyclesLostDueL3CacheMisses(before_sstate, after_sstate));
+	printf("L3CacheHitSnoop %llu\n", getL3CacheHitsSnoop(before_sstate, after_sstate));
+	printf("L3CacheHitNoSnoop %llu\n", getL3CacheHitsNoSnoop(before_sstate, after_sstate));
+	printf("All outgoing QPI Bytes %llu\n", getAllOutgoingQPILinkBytes(before_sstate, after_sstate));
+
 
 	if (arguments.allocator == ALLOCATOR_VMEM) {
 		for (i = 0; i < pools_count; ++i) {
@@ -339,6 +358,7 @@ main(int argc, char *argv[])
 	}
 
 	free(allocated_mem);
+	m->cleanup();
 
 	return (fails == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

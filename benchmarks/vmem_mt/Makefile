@@ -36,7 +36,7 @@
 TARGET = vmem_mt
 VMEM_PATH=../../src/nondebug/
 
-OBJS = vmem_mt.o tasks.o
+OBJS = vmem_mt.o tasks.o pci.o cpucounters.o client_bw.o msr.o utils.o
 
 include ../Makefile.inc
 
@@ -45,3 +45,9 @@ INCS := -I../../src/include/ -I.
 
 vmem_mt.o: vmem_mt.c
 tasks.o: tasks.c tasks.h
+pci.o: pci.cpp pci.h
+cpucounters.o: cpucounters.cpp cpucounters.h
+client_bw.o: client_bw.cpp client_bw.h
+msr.o: msr.cpp msr.h
+pci.o: pci.cpp pci.h
+utils.o: utils.cpp utils.h

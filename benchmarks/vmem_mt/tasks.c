@@ -61,7 +61,7 @@ allocator_t allocator;
 void *
 do_task(void *arg)
 {
-	struct task_def *t_def = arg;
+	struct task_def *t_def = static_cast<struct task_def *>(arg);
 	int i;
 
 	for (i = t_def->start; i < t_def->end; ++i) {
@@ -165,7 +165,7 @@ task_malloc(int i, void *arg, struct random_data *rand_state)
 	}
 
 	if (allocator == ALLOCATOR_VMEM) {
-		VMEM *pool = arg;
+		VMEM *pool = static_cast<VMEM *>(arg);
 		allocated_mem[i] = vmem_malloc(pool, size_to_alloc);
 	} else {
 		allocated_mem[i] = malloc(size_to_alloc);
@@ -185,7 +185,7 @@ task_free(int i, void *arg, struct random_data *rand_state)
 {
 	if (allocated_mem[i] != NULL) {
 		if (allocator == ALLOCATOR_VMEM) {
-			VMEM *pool = arg;
+			VMEM *pool = static_cast<VMEM *>(arg);
 			vmem_free(pool, allocated_mem[i]);
 		} else {
 			free(allocated_mem[i]);
