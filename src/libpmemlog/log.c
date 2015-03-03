@@ -363,6 +363,7 @@ pmemlog_persist(PMEMlogpool *plp, uint64_t new_write_offset)
 		pmem_drain(); /* data already flushed */
 	else
 		pmem_msync(plp->addr + old_write_offset, length);
+	VALGRIND_FULL_REORDER;
 
 	/* protect the log space range (debug version only) */
 	RANGE_RO(plp->addr + old_write_offset, length);
@@ -429,6 +430,7 @@ pmemlog_append(PMEMlogpool *plp, const void *buf, size_t count)
 			 */
 			RANGE_RW(&data[write_offset], count);
 
+			VALGRIND_ONLY_FAULT;
 			if (plp->is_pmem)
 				pmem_memcpy_nodrain(&data[write_offset],
 					buf, count);
@@ -501,6 +503,7 @@ pmemlog_appendv(PMEMlogpool *plp, const struct iovec *iov, int iovcnt)
 			errno = ENOSPC;
 			ret = -1;
 		} else {
+			VALGRIND_ONLY_FAULT;
 			/* append the data */
 			for (i = 0; i < iovcnt; ++i) {
 				buf = iov[i].iov_base;

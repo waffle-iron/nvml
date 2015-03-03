@@ -1,6 +1,5 @@
-#!/bin/bash -e
 #
-# Copyright (c) 2015, Intel Corporation
+# Copyright (c) 2014, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,30 +31,20 @@
 #
 
 #
-# src/test/obj_list_insert/TEST0 -- unit test for list_insert
+# src/test/log_reorder/Makefile -- build log_reorder unit test
 #
-# Adding item to list after the first element
-#
-export UNITTEST_NAME=obj_list_insert/TEST0
-export UNITTEST_NUM=0
+vpath %.c ../../common
 
-# standard unit test setup
-. ../unittest/unittest.sh
+TARGET = log_reorder
+OBJS = log_reorder.o util.o out.o
 
-export PMEM_LOG_LEVEL=4
-export PMEM_LOG_FILE=./trace_pmem$UNITTEST_NUM.log
-export PMEMOBJ_LOG_LEVEL=4
-export PMEMOBJ_LOG_FILE=./trace_pmemobj$UNITTEST_NUM.log
+LIBPMEM=y
+LIBPMEMLOG=y
 
-setup
+include ../Makefile.inc
 
-truncate -s1M $DIR/testfile
-expect_normal_exit ../obj_list/obj_list$EXESUFFIX $DIR/testfile\
-	i:0:0 P:2 R:2\
-	i:0:0 P:2 R:2\
-	i:0:0 P:2 R:2\
-	i:0:0 P:2 R:2
+out.o: CFLAGS += -DSRCVERSION=\"utversion\"
 
-check
+log_reorder.o: log_reorder.c
 
-pass
+INCS += -I../../common/

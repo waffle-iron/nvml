@@ -1,0 +1,7 @@
+blk_rw_reorder/TEST0: START: blk_rw_reorder
+ ./blk_rw_reorder$(nW) 512 $(nW)/testfile1 o r:0 r:1 r:3
+512 block size 512 usable blocks 32202
+read      lba 0: {1}
+read      lba 1: {2}
+read      lba 3: {3}
+blk_rw_reorder/TEST0: Done

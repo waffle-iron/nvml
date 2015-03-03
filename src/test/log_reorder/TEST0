@@ -1,6 +1,6 @@
 #!/bin/bash -e
 #
-# Copyright (c) 2015, Intel Corporation
+# Copyright (c) 2014-2015, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,29 +32,37 @@
 #
 
 #
-# src/test/obj_list_insert/TEST0 -- unit test for list_insert
+# src/test/log_reorder/TEST0 -- unit test for:
+# - pmemlog_nbyte
+# - pmemlog_tell
+# - pmemlog_walk
+# - pmemlog_rewind
+# in case of empty pool and:
+# - pmemlog_check
+# - pmemlog_open
+# - pmemlog_close
 #
-# Adding item to list after the first element
-#
-export UNITTEST_NAME=obj_list_insert/TEST0
+export UNITTEST_NAME=log_reorder/TEST0
 export UNITTEST_NUM=0
-
 # standard unit test setup
 . ../unittest/unittest.sh
 
-export PMEM_LOG_LEVEL=4
-export PMEM_LOG_FILE=./trace_pmem$UNITTEST_NUM.log
-export PMEMOBJ_LOG_LEVEL=4
-export PMEMOBJ_LOG_FILE=./trace_pmemobj$UNITTEST_NUM.log
+# doesn't make sense to run in local directory
+require_fs_type pmem non-pmem
+require_build_type debug
 
 setup
 
-truncate -s1M $DIR/testfile
-expect_normal_exit ../obj_list/obj_list$EXESUFFIX $DIR/testfile\
-	i:0:0 P:2 R:2\
-	i:0:0 P:2 R:2\
-	i:0:0 P:2 R:2\
-	i:0:0 P:2 R:2
+# prepare a 2MB log pool
+MIN_POOL_SIZE=$((2*1024*1024))
+create_log_pool $DIR/testfile1 $MIN_POOL_SIZE
+
+OPS="./log_reorder$EXESUFFIX $DIR/testfile1 a v n t w"
+
+do_reorder_test $DIR/testfile1 "$OPS" "outfile$UNITTEST_NUM.log" prog $PMEMPOOL\
+	"check -qry"
+
+expect_normal_exit ./log_reorder$EXESUFFIX $DIR/testfile1 n t w r
 
 check
 

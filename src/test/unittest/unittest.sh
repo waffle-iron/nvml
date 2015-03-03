@@ -372,21 +372,21 @@ function require_valgrind_pmemcheck() {
 	require_valgrind
 	local binary=$1
 	[ -n "$binary" ] || binary=*
-        strings ${binary}.static-debug 2>&1 | \
-            grep -q "compiled with support for Valgrind pmemcheck" && true
-        if [ $? -ne 0 ]; then
-            echo "$UNITTEST_NAME: SKIP not compiled with support for Valgrind pmemcheck"
-            exit 0
-        fi
+	strings ${binary}.static-debug 2>&1 | \
+	    grep -q "compiled with support for Valgrind pmemcheck" && true
+	if [ $? -ne 0 ]; then
+		echo "$UNITTEST_NAME: SKIP not compiled with support for Valgrind pmemcheck"
+		exit 0
+	fi
 
 	valgrind --tool=pmemcheck --help 2>&1 | \
 		grep -q "pmemcheck is Copyright (c)" && true
-        if [ $? -ne 0 ]; then
-            echo "$UNITTEST_NAME: SKIP valgrind package with pmemcheck required"
-            exit 0;
-        fi
+	if [ $? -ne 0 ]; then
+		echo "$UNITTEST_NAME: SKIP valgrind package with pmemcheck required"
+		exit 0;
+	fi
 
-        return
+	return
 }
 
 #
@@ -411,10 +411,10 @@ function set_valgrind_exe_name() {
 function require_valgrind_dev_3_7() {
 	require_valgrind
 	echo "
-        #include <valgrind/valgrind.h>
-        #if defined (VALGRIND_RESIZEINPLACE_BLOCK)
-        VALGRIND_VERSION_3_7_OR_LATER
-        #endif" | gcc -E - 2>&1 | \
+	#include <valgrind/valgrind.h>
+	#if defined (VALGRIND_RESIZEINPLACE_BLOCK)
+	VALGRIND_VERSION_3_7_OR_LATER
+	#endif" | gcc -E - 2>&1 | \
 		grep -q "VALGRIND_VERSION_3_7_OR_LATER" && return
 	echo "$UNITTEST_NAME: SKIP valgrind-devel package (ver 3.7 or later) required"
 	exit 0
@@ -427,13 +427,13 @@ function require_valgrind_dev_3_7() {
 function require_valgrind_dev_3_8() {
 	require_valgrind
 	echo "
-        #include <valgrind/valgrind.h>
-        #if defined (__VALGRIND_MAJOR__) && defined (__VALGRIND_MINOR__)
-        #if (__VALGRIND_MAJOR__ > 3) || \
-             ((__VALGRIND_MAJOR__ == 3) && (__VALGRIND_MINOR__ >= 8))
-        VALGRIND_VERSION_3_8_OR_LATER
-        #endif
-        #endif" | gcc -E - 2>&1 | \
+	#include <valgrind/valgrind.h>
+	#if defined (__VALGRIND_MAJOR__) && defined (__VALGRIND_MINOR__)
+	#if (__VALGRIND_MAJOR__ > 3) || \
+	    ((__VALGRIND_MAJOR__ == 3) && (__VALGRIND_MINOR__ >= 8))
+	VALGRIND_VERSION_3_8_OR_LATER
+	#endif
+	#endif" | gcc -E - 2>&1 | \
 		grep -q "VALGRIND_VERSION_3_8_OR_LATER" && return
 	echo "$UNITTEST_NAME: SKIP valgrind-devel package (ver 3.8 or later) required"
 	exit 0
@@ -446,13 +446,13 @@ function require_valgrind_dev_3_8() {
 function require_valgrind_dev_3_10() {
 	require_valgrind
 	echo "
-        #include <valgrind/valgrind.h>
-        #if defined (__VALGRIND_MAJOR__) && defined (__VALGRIND_MINOR__)
-        #if (__VALGRIND_MAJOR__ > 3) || \
-             ((__VALGRIND_MAJOR__ == 3) && (__VALGRIND_MINOR__ >= 10))
-        VALGRIND_VERSION_3_10_OR_LATER
-        #endif
-        #endif" | gcc -E - 2>&1 | \
+	#include <valgrind/valgrind.h>
+	#if defined (__VALGRIND_MAJOR__) && defined (__VALGRIND_MINOR__)
+	#if (__VALGRIND_MAJOR__ > 3) || \
+	    ((__VALGRIND_MAJOR__ == 3) && (__VALGRIND_MINOR__ >= 10))
+	VALGRIND_VERSION_3_10_OR_LATER
+	#endif
+	#endif" | gcc -E - 2>&1 | \
 		grep -q "VALGRIND_VERSION_3_10_OR_LATER" && return
 	echo "$UNITTEST_NAME: SKIP valgrind-devel package (ver 3.10 or later) required"
 	exit 0
@@ -492,6 +492,7 @@ function pass() {
 [ -n "$PMEMSPOIL" ] || PMEMSPOIL=../pmemspoil/pmemspoil
 [ -n "$PMEMWRITE" ] || PMEMWRITE=../pmemwrite/pmemwrite
 [ -n "$PMEMALLOC" ] || PMEMALLOC=../pmemalloc/pmemalloc
+[ -n "$PMREORDER" ] || PMREORDER=../../tools/pmreorder/pmreorder.py
 
 # Length of pool file's signature
 SIG_LEN=8
@@ -641,4 +642,97 @@ check_arena()
 		echo "error: can't find arena signature"
 		exit 1
 	fi
+}
+
+#
+# require_python_3 -- check if python3 is available
+#
+function require_python3()
+{
+	if hash python3 &>/dev/null;
+	then
+		PYTHON_EXE=python3
+	else
+		PYTHON_EXE=python
+	fi
+
+	case "$($PYTHON_EXE --version 2>&1)" in
+	    *" 3."*)
+		return
+		;;
+	    *)
+		echo "$UNITTEST_NAME: SKIP: required python version 3"
+		exit 0
+		;;
+	esac
+}
+
+#
+# do_reorder_test -- perform a reordering test
+#
+# This function expects 5 additional parameters. They are in order:
+# 1 - the pool file to be tested
+# 2 - the application and necessary parameters to run pmemcheck logging
+# 3 - the log output file
+# 4 - the checker type - for a list of supported types run `./pmreorder.py -h`
+# 5 - the path to the checker binary/library
+# 6 - the remaining parameters which will be passed to the consistency checker
+#     binary. If you are using a library checker, prepend '-n funcname'
+#
+function do_reorder_test()
+{
+	# python3 and pmemcheck are necessary
+	require_python3
+	require_valgrind_pmemcheck
+
+	#copy original file and perform store logging
+	cp $1 "$1.pmr"
+	LD_LIBRARY_PATH=$TEST_LD_LIBRARY_PATH valgrind --tool=pmemcheck -q\
+	--log-stores=yes --print-summary=no\
+	--log-file=store_log$UNITTEST_NUM.log $2
+
+	# shuffle files and do the reorder/check testing
+	mv $1 "$1.bak"
+	mv "$1.pmr" $1
+	LD_LIBRARY_PATH=$TEST_LD_LIBRARY_PATH $PYTHON_EXE $PMREORDER\
+	-l store_log$UNITTEST_NUM.log -t file -o $3 -c $4 -p $5 $6
+}
+
+#
+# create_obj_pool -- create an obj pool using pmempool
+#
+# This function expects 3 additional parameters. They are in order:
+# 1 - the pool file to be created
+# 2 - the size of the pool
+# 3 - the layout name
+#
+function create_obj_pool()
+{
+	LD_LIBRARY_PATH=$TEST_LD_LIBRARY_PATH $PMEMPOOL create --layout $3\
+	--size $2 obj $1
+}
+
+#
+# create_blk_pool -- create a blk pool using pmempool
+#
+# This function expects 3 additional parameters. They are in order:
+# 1 - the pool file to be created
+# 2 - the size of the pool
+# 3 - the block size
+#
+function create_blk_pool()
+{
+	LD_LIBRARY_PATH=$TEST_LD_LIBRARY_PATH $PMEMPOOL create blk --size=$2\
+	--write-layout=1 $3 $1
+}
+
+#
+# create_blk_pool -- create a log pool using pmempool
+#
+# This function expects 2 additional parameters. They are in order:
+# 1 - the pool file to be created
+# 2 - the size of the pool
+function create_log_pool()
+{
+	LD_LIBRARY_PATH=$TEST_LD_LIBRARY_PATH $PMEMPOOL create log --size=$2 $1
 }

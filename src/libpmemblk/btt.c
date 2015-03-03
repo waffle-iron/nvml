@@ -135,6 +135,7 @@
 #include "util.h"
 #include "btt.h"
 #include "btt_layout.h"
+#include "valgrind_internal.h"
 
 /*
  * The opaque btt handle containing state tracked by this module
@@ -1617,9 +1618,12 @@ btt_write(struct btt *bttp, int lane, uint64_t lba, const void *buf)
 	off_t data_block_off = arenap->dataoff +
 		(off_t)(free_entry & BTT_MAP_ENTRY_LBA_MASK) *
 		arenap->internal_lbasize;
+
+	VALGRIND_ONLY_FAULT;
 	if ((*bttp->ns_cbp->nswrite)(bttp->ns, lane, buf,
 				bttp->lbasize, data_block_off) < 0)
 		return -1;
+	VALGRIND_FULL_REORDER;
 
 	/*
 	 * Make the new block active atomically by updating the on-media flog

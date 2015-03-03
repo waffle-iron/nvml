@@ -1,4 +1,3 @@
-#!/bin/bash -e
 #
 # Copyright (c) 2015, Intel Corporation
 #
@@ -32,30 +31,18 @@
 #
 
 #
-# src/test/obj_list_insert/TEST0 -- unit test for list_insert
+# src/test/pmem_reorder_simple/Makefile -- build pmem_reorder_simple
+# unit test
 #
-# Adding item to list after the first element
-#
-export UNITTEST_NAME=obj_list_insert/TEST0
-export UNITTEST_NUM=0
+vpath %.c ../../common
 
-# standard unit test setup
-. ../unittest/unittest.sh
+TARGET = pmem_reorder_simple
+OBJS = pmem_reorder_simple.o util.o out.o
 
-export PMEM_LOG_LEVEL=4
-export PMEM_LOG_FILE=./trace_pmem$UNITTEST_NUM.log
-export PMEMOBJ_LOG_LEVEL=4
-export PMEMOBJ_LOG_FILE=./trace_pmemobj$UNITTEST_NUM.log
+LIBPMEM=y
 
-setup
+out.o: CFLAGS += -DSRCVERSION=\"utversion\"
 
-truncate -s1M $DIR/testfile
-expect_normal_exit ../obj_list/obj_list$EXESUFFIX $DIR/testfile\
-	i:0:0 P:2 R:2\
-	i:0:0 P:2 R:2\
-	i:0:0 P:2 R:2\
-	i:0:0 P:2 R:2
+include ../Makefile.inc
 
-check
-
-pass
+INCS += -I../../common/

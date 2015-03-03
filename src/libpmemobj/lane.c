@@ -238,7 +238,10 @@ lane_recover(PMEMobjpool *pop)
 	int j; /* section index */
 	struct lane_layout *layout;
 
-	FOREACH_LANE_SECTION(pop, layout, i, j) {
+for (j = 0; j < MAX_LANE_SECTION; ++j)
+	for (i = 0; i < pop->nlanes; ++i) {
+		layout = lane_get_layout(pop, i);
+//		LOG(1, "recover %d %d", i, j);
 		section_err = section_ops[j]->recover(pop,
 				&layout->sections[j]);
 		if (section_err) {

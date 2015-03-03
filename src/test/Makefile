@@ -146,7 +146,11 @@ TEST = blk_nblock\
        obj_pmalloc_mt\
        obj_many_size_allocs\
        obj_heap_state\
-       obj_check
+       obj_check\
+       blk_rw_reorder\
+       pmem_reorder_simple\
+       log_reorder\
+       obj_reorder_basic
 
 all     : TARGET = all
 clean   : TARGET = clean
