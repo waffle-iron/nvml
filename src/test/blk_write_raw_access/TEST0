@@ -1,3 +1,4 @@
+#!/bin/bash -e
 #
 # Copyright (c) 2014, Intel Corporation
 #
@@ -29,24 +30,34 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
 #
-# src/libpmemblk.map -- linker map file for libpmemblk
+# src/test/blk_rw/TEST0 -- unit test for pmemblk_read/write/set_zero/set_error
 #
-libpmemblk.so {
-	global:
-		pmemblk_check_version;
-		pmemblk_set_funcs;
-		pmemblk_create;
-		pmemblk_open;
-		pmemblk_close;
-		pmemblk_check;
-		pmemblk_nblock;
-		pmemblk_read;
-		pmemblk_write;
-		pmemblk_set_zero;
-		pmemblk_set_error;
-		pmemblk_write_hold;
-		pmemblk_write_release;
-	local:
-		*;
-};
+export UNITTEST_NAME=blk_write_raw_access/TEST0
+export UNITTEST_NUM=0
+
+# standard unit test setup
+. ../unittest/unittest.sh
+
+# doesn't make sense to run in local directory
+require_fs_type local pmem non-pmem
+
+setup
+
+# single arena and minimum pmemblk pool file case
+MIN_POOL_SIZE=$((16*1024*1024 + 8*1024))
+rm -f $DIR/testfile1
+truncate -s $MIN_POOL_SIZE $DIR/testfile1
+#
+# All reads to an unwritten block pool should return zeros.
+# Block 32202 is out of range and should return EINVAL.
+# Attempts to zero uninitialized blocks are nops (should succeed).
+#
+expect_normal_exit ./raw_access$EXESUFFIX 512 $DIR/testfile1 c\
+	w:0 w:1 r:0 r:1
+rm $DIR/testfile1
+
+check
+
+pass

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Intel Corporation
+# Copyright (c) 2014-2015, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -29,24 +29,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
 #
-# src/libpmemblk.map -- linker map file for libpmemblk
+# src/test/blk_rw/Makefile -- build blk_rw unit test
 #
-libpmemblk.so {
-	global:
-		pmemblk_check_version;
-		pmemblk_set_funcs;
-		pmemblk_create;
-		pmemblk_open;
-		pmemblk_close;
-		pmemblk_check;
-		pmemblk_nblock;
-		pmemblk_read;
-		pmemblk_write;
-		pmemblk_set_zero;
-		pmemblk_set_error;
-		pmemblk_write_hold;
-		pmemblk_write_release;
-	local:
-		*;
-};
+TARGET = raw_access
+OBJS = raw_access.o
+
+LIBPMEM=y
+LIBPMEMBLK=y
+
+include ../Makefile.inc
+
+raw_access.o: raw_access.c

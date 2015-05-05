@@ -136,6 +136,9 @@
 #include "btt.h"
 #include "btt_layout.h"
 
+/* dirty */
+#include "blk.h"
+
 /*
  * The opaque btt handle containing state tracked by this module
  * for the btt namespace.  This is created by btt_init(), handed to
@@ -1938,4 +1941,155 @@ btt_fini(struct btt *bttp)
 		Free(bttp->arenas);
 	}
 	Free(bttp);
+}
+
+int
+btt_write_hold(struct btt *bttp, int lane, uint64_t lba, void **outbuf)
+{
+	LOG(3, "bttp %p lane %d lba %ju", bttp, lane, lba);
+
+	if (invalid_lba(bttp, lba))
+		return -1;
+
+	/* first write through here will initialize the metadata layout */
+	if (!bttp->laidout) {
+		int err = 0;
+
+		if ((errno = pthread_mutex_lock(&bttp->layout_write_mutex))) {
+			LOG(1, "!pthread_mutex_lock");
+			return -1;
+		}
+		if (!bttp->laidout)
+			err = write_layout(bttp, lane, 1);
+
+		int oerrno = errno;
+		if ((errno = pthread_mutex_unlock(&bttp->layout_write_mutex)))
+			LOG(1, "!pthread_mutex_unlock");
+		errno = oerrno;
+
+		if (err < 0)
+			return err;
+	}
+
+	/* find which arena LBA lives in, and the offset to the map entry */
+	struct arena *arenap;
+	uint32_t premap_lba;
+	if (lba_to_arena_lba(bttp, lba, &arenap, &premap_lba) < 0)
+		return -1;
+
+	/* if the arena is in an error state, writing is not allowed */
+	if (arenap->flags & BTTINFO_FLAG_ERROR_MASK) {
+		LOG(1, "EIO due to btt_info error flags 0x%x",
+			arenap->flags & BTTINFO_FLAG_ERROR_MASK);
+		errno = EIO;
+		return -1;
+	}
+
+	/*
+	 * This routine was passed a unique "lane" which is an index
+	 * into the flog.  That means the free block held by flog[lane]
+	 * is assigned to this thread and to no other threads (no additional
+	 * locking required).  So start by performing the write to the
+	 * free block.  It is only safe to write to a free block if it
+	 * doesn't appear in the read tracking table, so scan that first
+	 * and if found, wait for the thread reading from it to finish.
+	 */
+	uint32_t free_entry = (arenap->flogs[lane].flog.old_map &
+			BTT_MAP_ENTRY_LBA_MASK) | BTT_MAP_ENTRY_NORMAL;
+
+	LOG(3, "free_entry %u (before mask %u)", free_entry,
+				arenap->flogs[lane].flog.old_map);
+
+	/* wait for other threads to finish any reads on free block */
+	for (int i = 0; i < bttp->nlane; i++)
+		while (arenap->rtt[i] == free_entry)
+			;
+
+	/* it is now safe to perform write to the free block */
+	off_t data_block_off = arenap->dataoff +
+		(off_t)(free_entry & BTT_MAP_ENTRY_LBA_MASK) *
+		arenap->internal_lbasize;
+
+	void *dest = ((struct pmemblk *)(bttp->ns))->data + data_block_off;
+
+#ifdef DEBUG
+	/* grab debug write lock */
+	if ((errno = pthread_mutex_lock(
+		&(((struct pmemblk *)(bttp->ns))->write_lock)))) {
+		LOG(1, "!pthread_mutex_lock");
+		return -1;
+	}
+#endif
+	/* unprotect the memory (debug version only) */
+	RANGE_RW(dest, arenap->internal_lbasize);
+
+	*outbuf = dest;
+	return 0;
+
+}
+
+int
+btt_write_release(struct btt *bttp, int lane, int prev_lane, uint64_t lba)
+{
+	LOG(3, "bttp %p lane %d prev_lane %d lba %ju", bttp, lane, prev_lane,
+		lba);
+#if 0
+	/* protect the memory again (debug version only) */
+	RANGE_RO(dest, count);
+#endif
+
+#ifdef DEBUG
+	/* release debug write lock */
+	if ((errno = pthread_mutex_unlock(
+		&(((struct pmemblk *)(bttp->ns))->write_lock))))
+		LOG(1, "!pthread_mutex_lock");
+#endif
+
+	/* find which arena LBA lives in, and the offset to the map entry */
+	struct arena *arenap;
+	uint32_t premap_lba;
+	if (lba_to_arena_lba(bttp, lba, &arenap, &premap_lba) < 0)
+		return -1;
+
+	/*
+	 * Make the new block active atomically by updating the on-media flog
+	 * and then updating the map.
+	 */
+	uint32_t old_entry;
+	if (map_lock(bttp, lane, arenap, &old_entry, premap_lba) < 0)
+		return -1;
+
+	old_entry = le32toh(old_entry);
+
+	/*
+	 * This routine was passed a unique "lane" which is an index
+	 * into the flog.  That means the free block held by flog[lane]
+	 * is assigned to this thread and to no other threads (no additional
+	 * locking required).  So start by performing the write to the
+	 * free block.  It is only safe to write to a free block if it
+	 * doesn't appear in the read tracking table, so scan that first
+	 * and if found, wait for the thread reading from it to finish.
+	 */
+	uint32_t free_entry = (arenap->flogs[prev_lane].flog.old_map &
+			BTT_MAP_ENTRY_LBA_MASK) | BTT_MAP_ENTRY_NORMAL;
+
+	/* update the flog */
+	if (flog_update(bttp, prev_lane, arenap, premap_lba,
+					old_entry, free_entry) < 0) {
+		map_abort(bttp, lane, arenap, premap_lba);
+		return -1;
+	}
+
+	if (map_unlock(bttp, lane, arenap, htole32(free_entry),
+					premap_lba) < 0) {
+		/*
+		 * A critical write error occurred, set the arena's
+		 * info block error bit.
+		 */
+		set_arena_error(bttp, arenap, lane);
+		errno = EIO;
+		return -1;
+	}
+
+	return 0;
 }

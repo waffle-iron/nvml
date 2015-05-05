@@ -82,6 +82,9 @@ int pmemblk_write(PMEMblkpool *pbp, const void *buf, off_t blockno);
 int pmemblk_set_zero(PMEMblkpool *pbp, off_t blockno);
 int pmemblk_set_error(PMEMblkpool *pbp, off_t blockno);
 
+int pmemblk_write_hold(PMEMblkpool *pbp, off_t blockno, void **outbuf);
+int pmemblk_write_release(PMEMblkpool *pbp, off_t blockno, int prev_lane);
+
 /*
  * Passing NULL to pmemblk_set_funcs() tells libpmemblk to continue to use the
  * default for that function.  The replacement functions must not make calls

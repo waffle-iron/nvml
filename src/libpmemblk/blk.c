@@ -674,3 +674,51 @@ pmemblk_check(const char *path)
 
 	return retval;
 }
+
+int
+pmemblk_write_hold(PMEMblkpool *pbp, off_t blockno, void **outbuf)
+{
+	LOG(3, "pbp %p outbuf %p blockno %lld", pbp, outbuf,
+		(long long)blockno);
+
+	if (pbp->rdonly) {
+		LOG(1, "EROFS (pool is read-only)");
+		errno = EROFS;
+		return -1;
+	}
+
+	int lane = lane_enter(pbp);
+
+	if (lane < 0)
+		return -1;
+
+	int err = btt_write_hold(pbp->bttp, lane, blockno, outbuf);
+
+	lane_exit(pbp, lane);
+
+	return err ? err : lane;
+}
+
+int
+pmemblk_write_release(PMEMblkpool *pbp, off_t blockno, int prev_lane)
+{
+	LOG(3, "pbp %p blockno %lld prevlane %d", pbp, (long long)blockno,
+		prev_lane);
+
+	if (pbp->rdonly) {
+		LOG(1, "EROFS (pool is read-only)");
+		errno = EROFS;
+		return -1;
+	}
+
+	int lane = lane_enter(pbp);
+
+	if (lane < 0)
+		return -1;
+
+	int err = btt_write_release(pbp->bttp, lane, prev_lane, blockno);
+
+	lane_exit(pbp, lane);
+
+	return err ? err : lane;
+}

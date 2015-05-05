@@ -1,0 +1,8 @@
+blk_write_raw_access/TEST0: START: blk_rw
+ ./raw_access$(nW) 512 $(nW)/testfile1 c w:0 w:1 r:0 r:1
+512 block size 512 usable blocks 32202
+write     lba 0: {1}
+write     lba 1: {2}
+read      lba 0: {1}
+read      lba 1: {2}
+blk_write_raw_access/TEST0: Done

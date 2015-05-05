@@ -58,3 +58,6 @@ int btt_set_zero(struct btt *bttp, int lane, uint64_t lba);
 int btt_set_error(struct btt *bttp, int lane, uint64_t lba);
 int btt_check(struct btt *bttp);
 void btt_fini(struct btt *bttp);
+
+int btt_write_hold(struct btt *bttp, int lane, uint64_t lba, void **outbuf);
+int btt_write_release(struct btt *bttp, int lane, int prev_lane, uint64_t lba);
