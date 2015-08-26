@@ -29,7 +29,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-PROGS = queue
+PROGS = queue example
 
 LIBS = -lpmemobj -lpmem -pthread
 
@@ -37,3 +37,5 @@ COMPILE_LANG = cpp
 include ../../Makefile.inc
 
 queue: queue.o
+example: example.o
+stl: stl.o
