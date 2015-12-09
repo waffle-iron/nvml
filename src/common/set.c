@@ -134,6 +134,24 @@ util_unmap_hdr(struct pool_set_part *part)
 	return 0;
 }
 
+/*
+ * util_map_part -- (internal) map a part of a pool set
+ */
+static void *
+get_last_mapped_addr(struct pool_set_part *part)
+{
+	struct pool_hdr *phdr = NULL;
+	void *ret = NULL;
+	size_t size = sizeof (struct pool_hdr);
+
+	if ((phdr = mmap(NULL, size, PROT_READ, MAP_SHARED, part->fd, 0)) == NULL)
+		return ret;
+
+	ret = (void *)le64toh(phdr->addr);
+	munmap(phdr, size);
+
+	return ret;
+}
 
 /*
  * util_map_part -- (internal) map a part of a pool set
@@ -938,6 +956,7 @@ util_header_create(struct pool_set *set, unsigned repidx, unsigned partidx,
 	hdrp->compat_features = htole32(compat);
 	hdrp->incompat_features = htole32(incompat);
 	hdrp->ro_compat_features = htole32(ro_compat);
+	hdrp->addr = htole64((uint64_t)set->replica[0]->part[0].addr);
 
 	memcpy(hdrp->poolset_uuid, set->uuid, POOL_HDR_UUID_LEN);
 
@@ -1254,17 +1273,22 @@ err:
  */
 static int
 util_replica_open(struct pool_set *set, unsigned repidx, int flags,
-	size_t hdrsize)
+	size_t hdrsize, int remap)
 {
-	LOG(3, "set %p repidx %u flags %d hdrsize %zu\n",
-		set, repidx, flags, hdrsize);
+	LOG(3, "set %p repidx %u flags %d hdrsize %zu remap %d\n",
+		set, repidx, flags, hdrsize, remap);
 
 	struct pool_replica *rep = set->replica[repidx];
 
 	rep->repsize -= (rep->nparts - 1) * hdrsize;
 
-	/* determine a hint address for mmap() */
-	void *addr = util_map_hint(rep->repsize);
+	/* determine an address for mmap() */
+	void *addr = NULL;
+	if (remap)
+		addr = get_last_mapped_addr(&rep->part[0]);
+	else
+		addr = util_map_hint(rep->repsize); /* XXX - randomize */
+
 	if (addr == NULL) {
 		ERR("cannot find a contiguous region of given size");
 		return -1;
@@ -1273,6 +1297,11 @@ util_replica_open(struct pool_set *set, unsigned repidx, int flags,
 	/* map the first part and reserve space for remaining parts */
 	if (util_map_part(&rep->part[0], addr, rep->repsize, 0, flags) != 0) {
 		LOG(2, "pool mapping failed - part #0");
+		return -1;
+	}
+
+	if (remap && rep->part[0].addr != addr) {
+		ERR("remap didn't happen at the same address");
 		return -1;
 	}
 
@@ -1358,7 +1387,7 @@ util_pool_open_nocheck(struct pool_set **setp, const char *path, int rdonly,
 	set->poolsize = SIZE_MAX;
 
 	for (unsigned r = 0; r < set->nreplicas; r++) {
-		if (util_replica_open(set, r, flags, hdrsize) != 0) {
+		if (util_replica_open(set, r, flags, hdrsize, 0) != 0) {
 			LOG(2, "replica open failed");
 			goto err;
 		}
@@ -1393,13 +1422,14 @@ err:
 int
 util_pool_open(struct pool_set **setp, const char *path, int rdonly,
 	size_t minsize, size_t hdrsize, const char *sig,
-	uint32_t major, uint32_t compat, uint32_t incompat, uint32_t ro_compat)
+	uint32_t major, uint32_t compat, uint32_t incompat, uint32_t ro_compat,
+	int remap)
 {
 	LOG(3, "setp %p path %s rdonly %d minsize %zu "
-		"hdrsize %zu sig %.8s major %u "
-		"compat %#x incompat %#x ro_comapt %#x",
+		"hdrsize %zu sig %s major %u "
+		"compat %#x incompat %#x ro_comapt %#x remap %d",
 		setp, path, rdonly, minsize, hdrsize,
-		sig, major, compat, incompat, ro_compat);
+		sig, major, compat, incompat, ro_compat, remap);
 
 	int flags = rdonly ? MAP_PRIVATE|MAP_NORESERVE : MAP_SHARED;
 
@@ -1417,7 +1447,7 @@ util_pool_open(struct pool_set **setp, const char *path, int rdonly,
 	set->poolsize = SIZE_MAX;
 
 	for (unsigned r = 0; r < set->nreplicas; r++) {
-		if (util_replica_open(set, r, flags, hdrsize) != 0) {
+		if (util_replica_open(set, r, flags, hdrsize, remap) != 0) {
 			LOG(2, "replica open failed");
 			goto err;
 		}

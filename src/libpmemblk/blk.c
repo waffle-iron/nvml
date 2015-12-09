@@ -510,7 +510,7 @@ pmemblk_open_common(const char *path, size_t bsize, int cow)
 			roundup(sizeof (struct pmemblk), Pagesize),
 			BLK_HDR_SIG, BLK_FORMAT_MAJOR,
 			BLK_FORMAT_COMPAT, BLK_FORMAT_INCOMPAT,
-			BLK_FORMAT_RO_COMPAT) != 0) {
+			BLK_FORMAT_RO_COMPAT, 0) != 0) {
 		LOG(2, "cannot open pool or pool set");
 		return NULL;
 	}

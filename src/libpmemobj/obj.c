@@ -813,7 +813,7 @@ pmemobj_open_common(const char *path, const char *layout, int cow, int boot)
 			roundup(sizeof (struct pmemobjpool), Pagesize),
 			OBJ_HDR_SIG, OBJ_FORMAT_MAJOR,
 			OBJ_FORMAT_COMPAT, OBJ_FORMAT_INCOMPAT,
-			OBJ_FORMAT_RO_COMPAT) != 0) {
+			OBJ_FORMAT_RO_COMPAT, 1) != 0) {
 		LOG(2, "cannot open pool or pool set");
 		return NULL;
 	}

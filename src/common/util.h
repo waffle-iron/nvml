@@ -126,7 +126,8 @@ struct pool_hdr {
 	unsigned char next_repl_uuid[POOL_HDR_UUID_LEN]; /* next replica */
 	uint64_t crtime;		/* when created (seconds since epoch) */
 	struct arch_flags arch_flags;	/* architecture identification flags */
-	unsigned char unused[3944];	/* must be zero */
+	uint64_t addr;			/* common remapping option */
+	unsigned char unused[3936];	/* must be zero */
 	uint64_t checksum;		/* checksum of above fields */
 };
 
@@ -222,7 +223,8 @@ int util_pool_open_nocheck(struct pool_set **setp, const char *path, int rdonly,
 		size_t hdrsize);
 int util_pool_open(struct pool_set **setp, const char *path, int rdonly,
 	size_t minsize, size_t hdrsize, const char *sig,
-	uint32_t major, uint32_t compat, uint32_t incompat, uint32_t ro_compat);
+	uint32_t major, uint32_t compat, uint32_t incompat, uint32_t ro_compat,
+	int remap);
 
 #define	COMPILE_ERROR_ON(cond) ((void)sizeof (char[(cond) ? -1 : 1]))
 

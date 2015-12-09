@@ -605,7 +605,8 @@ util_poolset_map(const char *fname, struct pool_set **poolset, int rdonly)
 			hdr.signature, hdr.major,
 			hdr.compat_features,
 			hdr.incompat_features,
-			hdr.ro_compat_features)) {
+			/* not really interested */
+			hdr.ro_compat_features, 0)) {
 		outv_err("openning poolset failed\n");
 		return -1;
 	}

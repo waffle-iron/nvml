@@ -242,7 +242,7 @@ pmemlog_open_common(const char *path, int cow)
 			roundup(sizeof (struct pmemlog), Pagesize),
 			LOG_HDR_SIG, LOG_FORMAT_MAJOR,
 			LOG_FORMAT_COMPAT, LOG_FORMAT_INCOMPAT,
-			LOG_FORMAT_RO_COMPAT) != 0) {
+			LOG_FORMAT_RO_COMPAT, 0) != 0) {
 		LOG(2, "cannot open pool or pool set");
 		return NULL;
 	}
