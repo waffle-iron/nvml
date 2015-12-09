@@ -95,11 +95,11 @@ main(int argc, char *argv[])
 	ASSERTeq(pmemobj_direct(oids[0]), NULL);
 
 	for (int i = 0; i < npools; ++i) {
-		oids[i] = (PMEMoid) {pops[i]->uuid_lo, 0};
+		oids[i] = (PMEMoid) {0};
 		ASSERTeq(pmemobj_direct(oids[i]), NULL);
 
 		uint64_t off = pops[i]->heap_offset;
-		oids[i] = (PMEMoid) {pops[i]->uuid_lo, off};
+		oids[i] = (PMEMoid) {off};
 		ASSERTeq((char *)pmemobj_direct(oids[i]) - off,
 			(char *)pops[i]);
 

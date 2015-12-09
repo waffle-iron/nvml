@@ -649,7 +649,7 @@ pmemobj_runtime_init(PMEMobjpool *pop, int rdonly, int boot)
 		if ((errno = pmemobj_boot(pop)) != 0)
 			return -1;
 
-		if ((errno = cuckoo_insert(pools_ht, pop->uuid_lo, pop)) != 0) {
+		if ((errno = cuckoo_insert(pools_ht, 0, pop)) != 0) {
 			ERR("!cuckoo_insert");
 			return -1;
 		}
@@ -980,7 +980,7 @@ pmemobj_close(PMEMobjpool *pop)
 
 	if (_pobj_cached_pool.pop == pop) {
 		_pobj_cached_pool.pop = NULL;
-		_pobj_cached_pool.uuid_lo = 0;
+//		_pobj_cached_pool.uuid_lo = 0;
 	}
 
 	pmemobj_cleanup(pop);
@@ -1039,7 +1039,7 @@ pmemobj_pool_by_oid(PMEMoid oid)
 {
 	LOG(3, "oid.off 0x%016jx", oid.off);
 
-	return cuckoo_get(pools_ht, oid.pool_uuid_lo);
+	return cuckoo_get(pools_ht, 0);
 }
 
 /*
@@ -1063,6 +1063,8 @@ pmemobj_pool_by_ptr(const void *addr)
 		return NULL;
 
 	return (PMEMobjpool *)key;
+
+	return cuckoo_get(pools, 0);
 }
 
 /* arguments for constructor_alloc_bytype */
@@ -1850,6 +1852,7 @@ pmemobj_next(PMEMoid oid)
 
 	if (oid.off == 0)
 		return OID_NULL;
+
 
 	PMEMobjpool *pop = pmemobj_pool_by_oid(oid);
 

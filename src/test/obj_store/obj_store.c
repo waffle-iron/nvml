@@ -456,7 +456,7 @@ test_null_oids(void)
 	ASSERTeq(pmemobj_alloc_usable_size(OID_NULL), 0);
 
 	PMEMoid next = pmemobj_next(OID_NULL);
-	ASSERT(next.off == 0 && next.pool_uuid_lo == 0);
+	ASSERT(next.off == 0);
 }
 
 static void

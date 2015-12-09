@@ -58,6 +58,8 @@ extern "C" {
 #include <string.h>
 #include <pthread.h>
 
+#include <stdio.h>
+
 /*
  * opaque type internal to libpmemobj
  */
@@ -170,16 +172,16 @@ int pmemobj_cond_wait(PMEMobjpool *pop, PMEMcond *condp,
  * Object handle
  */
 typedef struct pmemoid {
-	uint64_t pool_uuid_lo;
+//	uint64_t pool_uuid_lo;
 	uint64_t off;
 } PMEMoid;
 
-#define	OID_NULL	((PMEMoid) {0, 0})
+#define	OID_NULL	((PMEMoid) {0})
 #define	TOID_NULL(t)	((TOID(t))OID_NULL)
 #define	OID_IS_NULL(o)	((o).off == 0)
 #define	OID_EQUALS(lhs, rhs)\
-((lhs).off == (rhs).off &&\
-	(lhs).pool_uuid_lo == (rhs).pool_uuid_lo)
+((lhs).off == (rhs).off // &&\
+//	(lhs).pool_uuid_lo == (rhs).pool_uuid_lo)
 
 /*
  * Type safety macros
@@ -191,8 +193,8 @@ typedef struct pmemoid {
 	(o);\
 })
 #define	TOID_EQUALS(lhs, rhs)\
-((lhs).oid.off == (rhs).oid.off &&\
-	(lhs).oid.pool_uuid_lo == (rhs).oid.pool_uuid_lo)
+((lhs).oid.off == (rhs).oid.off) /* &&\
+	(lhs).oid.pool_uuid_lo == (rhs).oid.pool_uuid_lo) */
 
 /* type number of root object */
 #define	POBJ_ROOT_TYPE_NUM UINT16_MAX
@@ -313,7 +315,7 @@ PMEMobjpool *pmemobj_pool_by_oid(PMEMoid oid);
 extern int _pobj_cache_invalidate;
 extern __thread struct _pobj_pcache {
 	PMEMobjpool *pop;
-	uint64_t uuid_lo;
+//	uint64_t uuid_lo;
 	int invalidate;
 } _pobj_cached_pool;
 
@@ -323,21 +325,18 @@ extern __thread struct _pobj_pcache {
 static inline void *
 pmemobj_direct(PMEMoid oid)
 {
-	if (oid.off == 0 || oid.pool_uuid_lo == 0)
+	if (oid.off == 0)
 		return NULL;
 
-	if (_pobj_cache_invalidate != _pobj_cached_pool.invalidate ||
-		_pobj_cached_pool.uuid_lo != oid.pool_uuid_lo) {
+	if (_pobj_cache_invalidate != _pobj_cached_pool.invalidate) {
 		_pobj_cached_pool.invalidate = _pobj_cache_invalidate;
 
-		if (!(_pobj_cached_pool.pop = pmemobj_pool_by_oid(oid))) {
-			_pobj_cached_pool.uuid_lo = 0;
+		if ((_pobj_cached_pool.pop = pmemobj_pool(oid)) == NULL) {
 			return NULL;
 		}
 
-		_pobj_cached_pool.uuid_lo = oid.pool_uuid_lo;
 	}
-
+	printf("pop: %p, off %zu\n", _pobj_cached_pool.pop, oid.off);
 	return (void *)((uintptr_t)_pobj_cached_pool.pop + oid.off);
 }
 

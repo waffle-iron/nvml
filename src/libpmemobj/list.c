@@ -196,15 +196,15 @@ list_set_oid_redo_log(PMEMobjpool *pop,
 {
 	ASSERT(OBJ_PTR_IS_VALID(pop, oidp));
 
-	if (!oidp_inited || oidp->pool_uuid_lo != pop->uuid_lo) {
-		if (oidp_inited)
-			ASSERTeq(oidp->pool_uuid_lo, 0);
-		uint64_t oid_uuid_off = OBJ_PTR_TO_OFF(pop,
-				&oidp->pool_uuid_lo);
-		redo_log_store(pop, redo, redo_index, oid_uuid_off,
-				pop->uuid_lo);
-		redo_index += 1;
-	}
+//	if (!oidp_inited || oidp->pool_uuid_lo != pop->uuid_lo) {
+//		if (oidp_inited)
+//			ASSERTeq(oidp->pool_uuid_lo, 0);
+//		uint64_t oid_uuid_off = OBJ_PTR_TO_OFF(pop,
+//				&oidp->pool_uuid_lo);
+//		redo_log_store(pop, redo, redo_index, oid_uuid_off,
+//				pop->uuid_lo);
+//		redo_index += 1;
+//	}
 
 	uint64_t oid_off_off = OBJ_PTR_TO_OFF(pop, &oidp->off);
 	redo_log_store(pop, redo, redo_index, oid_off_off, obj_doffset);
@@ -228,17 +228,17 @@ list_update_head(PMEMobjpool *pop,
 	redo_log_store(pop, redo, redo_index + 0,
 			pe_first_off_off, first_offset);
 
-	if (head->pe_first.pool_uuid_lo == 0) {
-		uint64_t pe_first_uuid_off = OBJ_PTR_TO_OFF(pop,
-				&head->pe_first.pool_uuid_lo);
-
-		redo_log_store(pop, redo, redo_index + 1,
-				pe_first_uuid_off, pop->uuid_lo);
-
-		return redo_index + 2;
-	} else {
+//	if (head->pe_first.pool_uuid_lo == 0) {
+//		uint64_t pe_first_uuid_off = OBJ_PTR_TO_OFF(pop,
+//				&head->pe_first.pool_uuid_lo);
+//
+//		redo_log_store(pop, redo, redo_index + 1,
+//				pe_first_uuid_off, pop->uuid_lo);
+//
+//		return redo_index + 2;
+//	} else {
 		return redo_index + 1;
-	}
+//	}
 }
 
 /*
@@ -376,10 +376,10 @@ list_fill_entry_persist(PMEMobjpool *pop, struct list_entry *entry_ptr,
 	LOG(15, NULL);
 
 	VALGRIND_ADD_TO_TX(entry_ptr, sizeof (*entry_ptr));
-	entry_ptr->pe_next.pool_uuid_lo = pop->uuid_lo;
+//	entry_ptr->pe_next.pool_uuid_lo = pop->uuid_lo;
 	entry_ptr->pe_next.off = next_offset;
 
-	entry_ptr->pe_prev.pool_uuid_lo = pop->uuid_lo;
+//	entry_ptr->pe_prev.pool_uuid_lo = pop->uuid_lo;
 	entry_ptr->pe_prev.off = prev_offset;
 	VALGRIND_REMOVE_FROM_TX(entry_ptr, sizeof (*entry_ptr));
 
@@ -402,25 +402,25 @@ list_fill_entry_redo_log(PMEMobjpool *pop,
 	ASSERTne(args->entry_ptr, NULL);
 	ASSERTne(args->obj_doffset, 0);
 
-	if (set_uuid) {
-		VALGRIND_ADD_TO_TX(&(args->entry_ptr->pe_next.pool_uuid_lo),
-				sizeof (args->entry_ptr->pe_next.pool_uuid_lo));
-		VALGRIND_ADD_TO_TX(&(args->entry_ptr->pe_prev.pool_uuid_lo),
-				sizeof (args->entry_ptr->pe_prev.pool_uuid_lo));
-		/* don't need to fill pool uuid using redo log */
-		args->entry_ptr->pe_next.pool_uuid_lo = pop->uuid_lo;
-		args->entry_ptr->pe_prev.pool_uuid_lo = pop->uuid_lo;
-		VALGRIND_REMOVE_FROM_TX(
-				&(args->entry_ptr->pe_next.pool_uuid_lo),
-				sizeof (args->entry_ptr->pe_next.pool_uuid_lo));
-		VALGRIND_REMOVE_FROM_TX(
-				&(args->entry_ptr->pe_prev.pool_uuid_lo),
-				sizeof (args->entry_ptr->pe_prev.pool_uuid_lo));
-		pop->persist(pop, args->entry_ptr, sizeof (*args->entry_ptr));
-	} else {
-		ASSERTeq(args->entry_ptr->pe_next.pool_uuid_lo, pop->uuid_lo);
-		ASSERTeq(args->entry_ptr->pe_prev.pool_uuid_lo, pop->uuid_lo);
-	}
+//	if (set_uuid) {
+//		VALGRIND_ADD_TO_TX(&(args->entry_ptr->pe_next.pool_uuid_lo),
+//				sizeof (args->entry_ptr->pe_next.pool_uuid_lo));
+//		VALGRIND_ADD_TO_TX(&(args->entry_ptr->pe_prev.pool_uuid_lo),
+//				sizeof (args->entry_ptr->pe_prev.pool_uuid_lo));
+//		/* don't need to fill pool uuid using redo log */
+//		args->entry_ptr->pe_next.pool_uuid_lo = pop->uuid_lo;
+//		args->entry_ptr->pe_prev.pool_uuid_lo = pop->uuid_lo;
+//		VALGRIND_REMOVE_FROM_TX(
+//				&(args->entry_ptr->pe_next.pool_uuid_lo),
+//				sizeof (args->entry_ptr->pe_next.pool_uuid_lo));
+//		VALGRIND_REMOVE_FROM_TX(
+//				&(args->entry_ptr->pe_prev.pool_uuid_lo),
+//				sizeof (args->entry_ptr->pe_prev.pool_uuid_lo));
+//		pop->persist(pop, args->entry_ptr, sizeof (*args->entry_ptr));
+//	} else {
+//		ASSERTeq(args->entry_ptr->pe_next.pool_uuid_lo, pop->uuid_lo);
+//		ASSERTeq(args->entry_ptr->pe_prev.pool_uuid_lo, pop->uuid_lo);
+//	}
 
 	/* set current->next and current->prev using redo log */
 	uint64_t next_off_off = args->obj_doffset + NEXT_OFF;
@@ -836,7 +836,7 @@ list_insert_new(PMEMobjpool *pop, struct list_head *oob_head,
 					redo_index, oidp, obj_doffset, 0);
 		else {
 			oidp->off = obj_doffset;
-			oidp->pool_uuid_lo = pop->uuid_lo;
+//			oidp->pool_uuid_lo = pop->uuid_lo;
 		}
 	}
 

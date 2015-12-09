@@ -681,17 +681,17 @@ out_get_pmemoid_str(PMEMoid oid, uint64_t uuid_lo)
 	static char str_buff[STR_MAX] = {0, };
 	int free_cor = 0;
 	char *correct = "OK";
-	if (oid.pool_uuid_lo && oid.pool_uuid_lo != uuid_lo) {
-		snprintf(str_buff, STR_MAX, "wrong! should be 0x%016lx",
-				uuid_lo);
-		correct = strdup(str_buff);
-		if (!correct)
-			err(1, "Cannot allocate memory for PMEMoid string\n");
-		free_cor = 1;
-	}
+//	if (oid.pool_uuid_lo && oid.pool_uuid_lo != uuid_lo) {
+//		snprintf(str_buff, STR_MAX, "wrong! should be 0x%016lx",
+//				uuid_lo);
+//		correct = strdup(str_buff);
+//		if (!correct)
+//			err(1, "Cannot allocate memory for PMEMoid string\n");
+//		free_cor = 1;
+//	}
 
-	snprintf(str_buff, STR_MAX, "off: 0x%016lx pool_uuid_lo: 0x%016lx [%s]",
-			oid.off, oid.pool_uuid_lo, correct);
+	snprintf(str_buff, STR_MAX, "off: 0x%016lx [%s]",
+			oid.off, correct);
 
 	if (free_cor)
 		free(correct);

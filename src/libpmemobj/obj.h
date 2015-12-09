@@ -85,8 +85,7 @@
 	{\
 		PMEMoid o = (oid);\
 		OBJ_OID_IS_NULL(o) ||\
-		(o.pool_uuid_lo == (pop)->uuid_lo &&\
-		o.off >= (pop)->heap_offset &&\
+		(o.off >= (pop)->heap_offset &&\
 		o.off < (pop)->heap_offset + (pop)->heap_size);\
 	})
 

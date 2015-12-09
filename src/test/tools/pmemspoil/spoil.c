@@ -674,8 +674,8 @@ pmemspoil_process_PMEMoid(struct pmemspoil *psp,
 		PMEMoid *valp, size_t size, int le)
 {
 	PMEMoid v;
-	if (sscanf(pfp->value, "0x%" SCNx64 ",0x%" SCNx64,
-		&v.pool_uuid_lo, &v.off) != 2)
+	if (sscanf(pfp->value, "0x%" SCNx64,
+		&v.off) != 2)
 		return -1;
 
 	/* ignore 'le' */

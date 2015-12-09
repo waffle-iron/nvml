@@ -44,6 +44,6 @@ require_fs_type local
 
 setup
 
-expect_normal_exit ./obj_direct$EXESUFFIX $DIR 9
+expect_normal_exit ./obj_direct$EXESUFFIX $DIR 1
 
 pass

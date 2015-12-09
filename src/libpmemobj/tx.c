@@ -1535,12 +1535,12 @@ pmemobj_tx_add_range(PMEMoid oid, uint64_t hoff, size_t size)
 	struct lane_tx_runtime *lane =
 		(struct lane_tx_runtime *)tx.section->runtime;
 
-	if (oid.pool_uuid_lo != lane->pop->uuid_lo) {
-		ERR("invalid pool uuid");
-		pmemobj_tx_abort(EINVAL);
-
-		return EINVAL;
-	}
+//	if (oid.pool_uuid_lo != lane->pop->uuid_lo) {
+//		ERR("invalid pool uuid");
+//		pmemobj_tx_abort(EINVAL);
+//
+//		return EINVAL;
+//	}
 	ASSERT(OBJ_OID_IS_VALID(lane->pop, oid));
 
 	struct oob_header *oobh = OOB_HEADER_FROM_OID(lane->pop, oid);
@@ -1699,12 +1699,12 @@ pmemobj_tx_free(PMEMoid oid)
 	struct lane_tx_runtime *lane =
 		(struct lane_tx_runtime *)tx.section->runtime;
 
-	if (lane->pop->uuid_lo != oid.pool_uuid_lo) {
-		ERR("invalid pool uuid");
-		errno = EINVAL;
-		pmemobj_tx_abort(EINVAL);
-		return EINVAL;
-	}
+//	if (lane->pop->uuid_lo != oid.pool_uuid_lo) {
+//		ERR("invalid pool uuid");
+//		errno = EINVAL;
+//		pmemobj_tx_abort(EINVAL);
+//		return EINVAL;
+//	}
 	ASSERT(OBJ_OID_IS_VALID(lane->pop, oid));
 
 	struct lane_tx_layout *layout =

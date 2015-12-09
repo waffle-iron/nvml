@@ -244,23 +244,23 @@ FUNC_MOCK_RUN_DEFAULT {
 			linear_alloc(&heap_offset, LANE_SECTION_LEN));
 
 	/* Alloc in band lists */
-	List.oid.pool_uuid_lo = Pop->uuid_lo;
+//	List.oid.pool_uuid_lo = Pop->uuid_lo;
 	List.oid.off = linear_alloc(&heap_offset, sizeof (struct list));
 
-	List_sec.oid.pool_uuid_lo = Pop->uuid_lo;
+//	List_sec.oid.pool_uuid_lo = Pop->uuid_lo;
 	List_sec.oid.off = linear_alloc(&heap_offset, sizeof (struct list));
 
 	/* Alloc out of band lists */
-	List_oob.oid.pool_uuid_lo = Pop->uuid_lo;
+//	List_oob.oid.pool_uuid_lo = Pop->uuid_lo;
 	List_oob.oid.off = linear_alloc(&heap_offset, sizeof (struct oob_list));
 
-	List_oob_sec.oid.pool_uuid_lo = Pop->uuid_lo;
+//	List_oob_sec.oid.pool_uuid_lo = Pop->uuid_lo;
 	List_oob_sec.oid.off =
 			linear_alloc(&heap_offset, sizeof (struct oob_list));
 
 	Item = (void *)((uintptr_t)Pop +
 			linear_alloc(&heap_offset, sizeof (*Item)));
-	Item->oid.pool_uuid_lo = Pop->uuid_lo;
+//	Item->oid.pool_uuid_lo = Pop->uuid_lo;
 	Item->oid.off = linear_alloc(&heap_offset, sizeof (struct oob_item));
 	Pop->persist(Pop, Item, sizeof (*Item));
 
@@ -281,7 +281,7 @@ FUNC_MOCK_END
  */
 FUNC_MOCK(pmemobj_close, void, PMEMobjpool *pop)
 	_pobj_cached_pool.pop = NULL;
-	_pobj_cached_pool.uuid_lo = 0;
+//	_pobj_cached_pool.uuid_lo = 0;
 	Pop = NULL;
 	munmap(Pop, Pop->size);
 FUNC_MOCK_END
@@ -335,8 +335,8 @@ FUNC_MOCK(pmemobj_alloc, PMEMoid, PMEMobjpool *pop, PMEMoid *oidp,
 		void (*constructor)(PMEMobjpool *pop, void *ptr, void *arg),
 		void *arg)
 	FUNC_MOCK_RUN_DEFAULT {
-		PMEMoid oid = {0, 0};
-		oid.pool_uuid_lo = 0;
+		PMEMoid oid = {0};
+//		oid.pool_uuid_lo = 0;
 		pmalloc(NULL, &oid.off, size, OOB_OFF);
 		oid.off += OOB_OFF;
 		if (oidp) {
