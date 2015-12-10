@@ -51,7 +51,9 @@ struct lane_list_section {
 };
 
 struct list_entry {
+//	uint64_t a;
 	PMEMoid pe_next;
+//	uint64_t b;
 	PMEMoid pe_prev;
 };
 

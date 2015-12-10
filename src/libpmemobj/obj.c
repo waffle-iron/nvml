@@ -56,7 +56,7 @@
 static struct cuckoo *pools_ht; /* hash table used for searching by UUID */
 static struct ctree *pools_tree; /* tree used for searching by address */
 
-int _pobj_cache_invalidate;
+int _pobj_cache_invalidate = 1;
 __thread struct _pobj_pcache _pobj_cached_pool;
 
 /*
@@ -813,7 +813,7 @@ pmemobj_open_common(const char *path, const char *layout, int cow, int boot)
 			roundup(sizeof (struct pmemobjpool), Pagesize),
 			OBJ_HDR_SIG, OBJ_FORMAT_MAJOR,
 			OBJ_FORMAT_COMPAT, OBJ_FORMAT_INCOMPAT,
-			OBJ_FORMAT_RO_COMPAT, 1) != 0) {
+			OBJ_FORMAT_RO_COMPAT, 0) != 0) {
 		LOG(2, "cannot open pool or pool set");
 		return NULL;
 	}
@@ -970,7 +970,7 @@ pmemobj_close(PMEMobjpool *pop)
 
 	_pobj_cache_invalidate++;
 
-	if (cuckoo_remove(pools_ht, pop->uuid_lo) != pop) {
+	if (cuckoo_remove(pools_ht, 0) != pop) {
 		ERR("cuckoo_remove");
 	}
 
@@ -1063,8 +1063,6 @@ pmemobj_pool_by_ptr(const void *addr)
 		return NULL;
 
 	return (PMEMobjpool *)key;
-
-	return cuckoo_get(pools, 0);
 }
 
 /* arguments for constructor_alloc_bytype */

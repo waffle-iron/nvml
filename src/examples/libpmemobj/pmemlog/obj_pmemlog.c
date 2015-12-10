@@ -203,7 +203,8 @@ pmemlog_appendv(PMEMlogpool *plp, const struct iovec *iov, int iovcnt)
 	/* add the base object to the undo log - once for the transaction */
 	pmemobj_tx_add_range(baseoid, 0, sizeof (struct base));
 	/* add the tail entry once to the undo log */
-	pmemobj_tx_add_range(bp->tail, 0, sizeof (struct log));
+	if (!OID_IS_NULL(bp->tail))
+		pmemobj_tx_add_range(bp->tail, 0, sizeof (struct log));
 
 	/* append the data */
 	for (int i = 0; i < iovcnt; ++i) {

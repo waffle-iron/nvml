@@ -84,7 +84,7 @@ main(int argc, char *argv[])
 		ASSERTeq(r, 0);
 	}
 
-	PMEMoid invalid = {123, 321};
+	PMEMoid invalid = {321};
 
 	ASSERTeq(pmemobj_pool_by_oid(OID_NULL), NULL);
 	ASSERTeq(pmemobj_pool_by_oid(invalid), NULL);

@@ -168,7 +168,7 @@ struct pmemobjpool {
 struct oob_header_data {
 	uint16_t internal_type;
 	type_num_t user_type;
-	uint8_t padding[4];
+	uint8_t padding[20];
 };
 
 /*

@@ -55,6 +55,8 @@ TOID_DECLARE(struct list, 1);
 TOID_DECLARE(struct oob_list, 2);
 TOID_DECLARE(struct oob_item, 3);
 
+int _pobj_cache_invalidate = 1;
+
 struct item {
 	int id;
 	POBJ_LIST_ENTRY(struct item) next;

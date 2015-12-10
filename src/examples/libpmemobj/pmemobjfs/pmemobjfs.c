@@ -86,7 +86,7 @@ if (log_fh) {\
 struct pmemobjfs {
 	PMEMobjpool *pop;
 	struct map_ctx *mapc;
-	uint64_t pool_uuid_lo;
+//	uint64_t pool_uuid_lo;
 	int ioctl_cmd;
 	uint64_t ioctl_off;
 	uint64_t block_size;
@@ -1538,7 +1538,7 @@ pmemobjfs_fuse_releasedir(const char *path, struct fuse_file_info *fi)
 
 	TOID(struct objfs_inode) inode;
 	inode.oid.off = fi->fh;
-	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
+//	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
 
 	/* remove inode from opened inodes map */
 	int ret = pmemobjfs_close(objfs, inode);
@@ -1556,14 +1556,14 @@ pmemobjfs_fuse_readdir(const char *path, void *buff, fuse_fill_dir_t fill,
 		off_t off, struct fuse_file_info *fi)
 {
 	log("%s off = %lu", path, off);
-	struct pmemobjfs *objfs = PMEMOBJFS;
+//	struct pmemobjfs *objfs = PMEMOBJFS;
 
 	if (!fi->fh)
 		return -EINVAL;
 
 	TOID(struct objfs_inode) inode;
 	inode.oid.off = fi->fh;
-	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
+//	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
 
 	if (!TOID_VALID(inode))
 		return -EINVAL;
@@ -1756,7 +1756,7 @@ pmemobjfs_fuse_release(const char *path, struct fuse_file_info *fi)
 
 	TOID(struct objfs_inode) inode;
 	inode.oid.off = fi->fh;
-	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
+//	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
 
 	int ret = pmemobjfs_close(objfs, inode);
 
@@ -1784,7 +1784,7 @@ pmemobjfs_fuse_write(const char *path, const char *buff, size_t size,
 
 	TOID(struct objfs_inode) inode;
 	inode.oid.off = fi->fh;
-	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
+//	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
 
 	if (!TOID_VALID(inode))
 		return -EINVAL;
@@ -1807,7 +1807,7 @@ pmemobjfs_fuse_read(const char *path, char *buff, size_t size, off_t off,
 
 	TOID(struct objfs_inode) inode;
 	inode.oid.off = fi->fh;
-	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
+//	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
 
 	if (!TOID_VALID(inode))
 		return -EINVAL;
@@ -1846,7 +1846,7 @@ pmemobjfs_fuse_ftruncate(const char *path, off_t off, struct fuse_file_info *fi)
 
 	TOID(struct objfs_inode) inode;
 	inode.oid.off = fi->fh;
-	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
+//	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
 
 	if (!TOID_VALID(inode))
 		return -EINVAL;
@@ -1879,14 +1879,14 @@ static int
 pmemobjfs_fuse_flush(const char *path, struct fuse_file_info *fi)
 {
 	log("%s", path);
-	struct pmemobjfs *objfs = PMEMOBJFS;
+//	struct pmemobjfs *objfs = PMEMOBJFS;
 
 	if (!fi->fh)
 		return -EINVAL;
 
 	TOID(struct objfs_inode) inode;
 	inode.oid.off = fi->fh;
-	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
+//	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
 
 	if (!TOID_VALID(inode))
 		return -EINVAL;
@@ -2055,7 +2055,7 @@ pmemobjfs_fuse_fallocate(const char *path, int mode, off_t offset, off_t size,
 
 	TOID(struct objfs_inode) inode;
 	inode.oid.off = fi->fh;
-	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
+//	inode.oid.pool_uuid_lo = objfs->pool_uuid_lo;
 
 	if (!TOID_VALID(inode))
 		return -EINVAL;
@@ -2108,7 +2108,7 @@ pmemobjfs_fuse_init(struct fuse_conn_info *conn)
 	/* fill some runtime information */
 	objfs->block_size = D_RO(super)->block_size;
 	objfs->max_name = objfs->block_size - sizeof (struct objfs_dir_entry);
-	objfs->pool_uuid_lo = super.oid.pool_uuid_lo;
+//	objfs->pool_uuid_lo = super.oid.pool_uuid_lo;
 
 	TX_BEGIN(objfs->pop) {
 		/* release all opened inodes */

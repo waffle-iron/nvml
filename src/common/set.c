@@ -1301,7 +1301,8 @@ util_replica_open(struct pool_set *set, unsigned repidx, int flags,
 	}
 
 	if (remap && rep->part[0].addr != addr) {
-		ERR("remap didn't happen at the same address");
+		ERR("remap didn't happen at the same address %p != %p",
+			rep->part[0].addr, addr);
 		return -1;
 	}
 

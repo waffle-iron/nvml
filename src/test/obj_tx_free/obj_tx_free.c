@@ -99,29 +99,29 @@ do_tx_free_no_tx(PMEMobjpool *pop)
 	ASSERT(!TOID_IS_NULL(obj));
 }
 
-/*
- * do_tx_free_wrong_uuid -- try to free object with invalid uuid
- */
-static void
-do_tx_free_wrong_uuid(PMEMobjpool *pop)
-{
-	int ret;
-	PMEMoid oid = do_tx_alloc(pop, TYPE_FREE_WRONG_UUID);
-//	oid.pool_uuid_lo = ~oid.pool_uuid_lo;
-
-	TX_BEGIN(pop) {
-		ret = pmemobj_tx_free(oid);
-		ASSERTeq(ret, 0);
-	} TX_ONABORT {
-		ret = -1;
-	} TX_END
-
-	ASSERTeq(ret, -1);
-
-	TOID(struct object) obj;
-	TOID_ASSIGN(obj, pmemobj_first(pop, TYPE_FREE_WRONG_UUID));
-	ASSERT(!TOID_IS_NULL(obj));
-}
+///*
+// * do_tx_free_wrong_uuid -- try to free object with invalid uuid
+// */
+//static void
+//do_tx_free_wrong_uuid(PMEMobjpool *pop)
+//{
+//	int ret;
+//	PMEMoid oid = do_tx_alloc(pop, TYPE_FREE_WRONG_UUID);
+////	oid.pool_uuid_lo = ~oid.pool_uuid_lo;
+//
+//	TX_BEGIN(pop) {
+//		ret = pmemobj_tx_free(oid);
+//		ASSERTeq(ret, 0);
+//	} TX_ONABORT {
+//		ret = -1;
+//	} TX_END
+//
+//	ASSERTeq(ret, -1);
+//
+//	TOID(struct object) obj;
+//	TOID_ASSIGN(obj, pmemobj_first(pop, TYPE_FREE_WRONG_UUID));
+//	ASSERT(!TOID_IS_NULL(obj));
+//}
 
 /*
  * do_tx_free_null_oid -- call pmemobj_tx_free with OID_NULL
@@ -384,8 +384,8 @@ main(int argc, char *argv[])
 
 	do_tx_free_no_tx(pop);
 	VALGRIND_WRITE_STATS;
-	do_tx_free_wrong_uuid(pop);
-	VALGRIND_WRITE_STATS;
+//	do_tx_free_wrong_uuid(pop);
+//	VALGRIND_WRITE_STATS;
 	do_tx_free_null_oid(pop);
 	VALGRIND_WRITE_STATS;
 	do_tx_free_commit(pop);

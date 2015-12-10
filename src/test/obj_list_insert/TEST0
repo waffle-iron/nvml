@@ -43,6 +43,8 @@ export UNITTEST_NUM=0
 . ../unittest/unittest.sh
 
 setup
+export PMEMOBJ_LOG_LEVEL=15
+export PMEMOBJ_LOG_FILE=dupa.log
 
 truncate -s1M $DIR/testfile
 expect_normal_exit ../obj_list/obj_list$EXESUFFIX $DIR/testfile\

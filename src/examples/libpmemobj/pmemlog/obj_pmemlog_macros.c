@@ -183,7 +183,8 @@ pmemlog_appendv(PMEMlogpool *plp, const struct iovec *iov, int iovcnt)
 	TX_BEGIN_LOCK(pop, TX_LOCK_RWLOCK, &D_RW(bp)->rwlock, TX_LOCK_NONE) {
 		/* add the base object and tail entry to the undo log */
 		TX_ADD(bp);
-		TX_ADD(D_RW(bp)->tail);
+		if (!TOID_IS_NULL(D_RO(bp)->tail))
+			TX_ADD(D_RW(bp)->tail);
 		/* append the data */
 		for (int i = 0; i < iovcnt; ++i) {
 			char *buf = iov[i].iov_base;

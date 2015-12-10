@@ -1531,10 +1531,8 @@ pmemobj_tx_add_range(PMEMoid oid, uint64_t hoff, size_t size)
 		ERR("invalid tx stage");
 		return EINVAL;
 	}
-
 	struct lane_tx_runtime *lane =
 		(struct lane_tx_runtime *)tx.section->runtime;
-
 //	if (oid.pool_uuid_lo != lane->pop->uuid_lo) {
 //		ERR("invalid pool uuid");
 //		pmemobj_tx_abort(EINVAL);

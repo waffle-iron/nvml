@@ -330,13 +330,11 @@ pmemobj_direct(PMEMoid oid)
 
 	if (_pobj_cache_invalidate != _pobj_cached_pool.invalidate) {
 		_pobj_cached_pool.invalidate = _pobj_cache_invalidate;
-
-		if ((_pobj_cached_pool.pop = pmemobj_pool(oid)) == NULL) {
+		if ((_pobj_cached_pool.pop = pmemobj_pool_by_oid(oid)) == NULL) {
 			return NULL;
 		}
 
 	}
-	printf("pop: %p, off %zu\n", _pobj_cached_pool.pop, oid.off);
 	return (void *)((uintptr_t)_pobj_cached_pool.pop + oid.off);
 }
 
