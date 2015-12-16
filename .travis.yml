@@ -4,7 +4,6 @@ addons:
         packages:
         - uuid-dev
         - libc6-dbg
-        - libunwind7-dev
         - autoconf
 cache:
     directories:
@@ -18,7 +17,7 @@ before_install:
   - cp src/test/testconfig.sh.example src/test/testconfig.sh
   - export PATH=$PATH:$HOME/valgrind/bin
   - export C_INCLUDE_PATH=$C_INCLUDE_PATH:$HOME/valgrind/include
-script: make cstyle && make -j2 USE_LIBUNWIND=1 && make -j2 test USE_LIBUNWIND=1 && make check && make DESTDIR=/tmp source
+script: make cstyle && make -j2 && make -j2 test && make check && make DESTDIR=/tmp source
 env:
   - EXTRA_CFLAGS=-DUSE_VALGRIND
   - EXTRA_CFLAGS=
