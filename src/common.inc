@@ -76,6 +76,7 @@ export exec_prefix := $(prefix)
 export sysconfdir := $(prefix)/etc
 export datarootdir := $(prefix)/share
 export mandir := $(datarootdir)/man
+export docdir := $(datarootdir)/doc
 export man1dir := $(mandir)/man1
 export man3dir := $(mandir)/man3
 

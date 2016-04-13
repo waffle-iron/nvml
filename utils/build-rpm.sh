@@ -37,20 +37,25 @@
 SCRIPT_DIR=$(dirname $0)
 source $SCRIPT_DIR/pkg-common.sh
 
-if [ $# -lt 4 -o $# -gt 5 ]
+if [ $# -lt 6 -o $# -gt 7 ]
 then
-	echo "Usage: $(basename $0) VERSION_TAG SOURCE_DIR WORKING_DIR"\
-					"OUT_DIR [TEST_CONFIG_FILE]"
-	exit 1
+        echo "Usage: $(basename $0) VERSION_TAG SOURCE_DIR WORKING_DIR"\
+                                        "OUT_DIR EXPERIMENTAL RUN_CHECK"\
+                                        "[TEST_CONFIG_FILE] "
+        exit 1
 fi
 
 PACKAGE_VERSION_TAG=$1
 SOURCE=$2
 WORKING_DIR=$3
 OUT_DIR=$4
-TEST_CONFIG_FILE=$5
+EXPERIMENTAL=$5
+BUILD_PACKAGE_CHECK=$6
+TEST_CONFIG_FILE=$7
 
-function convert_changelog() {
+function create_changelog() {
+	echo
+	echo "%changelog"
 	while read
 	do
 		if [[ $REPLY =~ $REGEX_DATE_AUTHOR ]]
@@ -66,6 +71,24 @@ function convert_changelog() {
 			echo "  ${BASH_REMATCH[1]}"
 		fi
 	done < $1
+}
+
+function add_experimental_packages() {
+cat << EOF >> $RPM_SPEC_FILE
+
+%package -n libcppobj-devel
+Summary: C++ bindings for libpmemobj
+Group: Development/Libraries
+Requires: libpmemobj-devel = %version
+%description -n libcppobj-devel
+Development files for NVML C++ libpmemobj bindings
+
+%files -n libcppobj-devel
+%defattr(-,root,root,-)
+%{_libdir}/pkgconfig/libcppobj.pc
+%{_includedir}/libpmemobj/*.hpp
+%{_docdir}/libcppobj-dev/*
+EOF
 }
 
 check_tool rpmbuild
@@ -84,6 +107,22 @@ if [ -z "$PACKAGE_VERSION" ]
 then
 	error "Can not parse version from '${PACKAGE_VERSION_TAG}'"
 	exit 1
+fi
+
+CHECK_CMD="
+%check
+if [ -f $TEST_CONFIG_FILE ]; then
+	cp $TEST_CONFIG_FILE src/test/testconfig.sh
+else
+	cp src/test/testconfig.sh.example src/test/testconfig.sh
+fi
+
+make check
+"
+
+if [ "${BUILD_PACKAGE_CHECK}" != "y" ]
+then
+	CHECK_CMD=""
 fi
 
 PACKAGE_SOURCE=${PACKAGE_NAME}-${PACKAGE_VERSION}
@@ -157,6 +196,7 @@ $(cat $MAGIC_UNINSTALL | sed '/^#/d')
 %package -n libpmem-devel
 Summary: libpmem development library
 Group: Development/Libraries
+Requires: libpmem = %version
 %description -n libpmem-devel
 Development files for NVML libpmem library
 
@@ -184,6 +224,7 @@ NVML libpmemblk library
 %package -n libpmemblk-devel
 Summary: libpmemblk development library
 Group: Development/Libraries
+Requires: libpmemblk = %version
 %description -n libpmemblk-devel
 Development files for NVML libpmemblk library
 
@@ -211,6 +252,7 @@ NVML libpmemlog library
 %package -n libpmemlog-devel
 Summary: libpmemlog development library
 Group: Development/Libraries
+Requires: libpmemlog = %version
 %description -n libpmemlog-devel
 Development files for NVML libpmemlog library
 
@@ -238,6 +280,7 @@ NVML libpmemobj library
 %package -n libpmemobj-devel
 Summary: libpmemobj development library
 Group: Development/Libraries
+Requires: libpmemobj = %version
 %description -n libpmemobj-devel
 Development files for NVML libpmemobj library
 
@@ -265,6 +308,7 @@ NVML libvmem library
 %package -n libvmem-devel
 Summary: libvmem development library
 Group: Development/Libraries
+Requires: libvmem = %version
 %description -n libvmem-devel
 Development files for NVML libvmem library
 
@@ -292,6 +336,7 @@ NVML libvmmalloc library
 %package -n libvmmalloc-devel
 Summary: libvmmalloc development library
 Group: Development/Libraries
+Requires: libvmmalloc = %version
 %description -n libvmmalloc-devel
 Development files for NVML libvmmalloc library
 
@@ -337,18 +382,12 @@ make install DESTDIR=%{buildroot}\
 	includedir=%{_includedir}\
 	mandir=%{_mandir}\
 	bindir=%{_bindir}\
-	sysconfdir=%{_sysconfdir}
+	sysconfdir=%{_sysconfdir}\
+	EXPERIMENTAL=${EXPERIMENTAL}
 mkdir -p %{buildroot}%{_datadir}/nvml
 cp utils/nvml.magic %{buildroot}%{_datadir}/nvml/
 
-%check
-if [ -f $TEST_CONFIG_FILE ]; then
-	cp $TEST_CONFIG_FILE src/test/testconfig.sh
-else
-	cp src/test/testconfig.sh.example src/test/testconfig.sh
-fi
-
-make check
+${CHECK_CMD}
 
 %clean
 make clobber
@@ -357,10 +396,15 @@ make clobber
 %debug_package
 %endif
 
-%changelog
 EOF
 
-[ -f $CHANGELOG_FILE ] && convert_changelog $CHANGELOG_FILE >> $RPM_SPEC_FILE
+# Experimental features
+if [ "${EXPERIMENTAL}" = "y" ]
+	then
+	add_experimental_packages;
+fi
+
+[ -f $CHANGELOG_FILE ] && create_changelog $CHANGELOG_FILE >> $RPM_SPEC_FILE
 
 tar zcf $PACKAGE_TARBALL $PACKAGE_SOURCE
 

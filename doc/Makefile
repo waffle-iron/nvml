@@ -56,6 +56,8 @@ DOXYGEN_HTMLDIR=cpp_html
 
 MANPAGES_DESTDIR_1 = $(DESTDIR)$(man1dir)
 MANPAGES_DESTDIR_3 = $(DESTDIR)$(man3dir)
+DOCS_DESTDIR = $(DESTDIR)$(docdir)
+CPP_DOCS_DESTDIR = $(DOCS_DESTDIR)/libcppobj-dev
 
 all: $(TXTFILES)
 
@@ -80,6 +82,18 @@ clean:
 clobber: clean
 	$(RM) -rf $(TXTFILES) $(HTMLFILES) $(GZFILES) $(DOXYGEN_HTMLDIR)
 
+ifeq ($(EXPERIMENTAL),y)
+install-cpp: doxygen_docs
+	./install_cpp_docs.sh $(DOXYGEN_HTMLDIR) $(CPP_DOCS_DESTDIR)
+
+install: install-cpp
+
+uninstall-cpp:
+	$(RM) -rf $(CPP_DOCS_DESTDIR)
+
+uninstall: uninstall-cpp
+endif
+
 install: compress
 	install -d $(MANPAGES_DESTDIR_1)
 	install -p -m 0644 $(GZFILES_1) $(MANPAGES_DESTDIR_1)
@@ -90,4 +104,5 @@ uninstall:
 	$(foreach f, $(GZFILES_1), $(RM) $(MANPAGES_DESTDIR_1)/$(f))
 	$(foreach f, $(GZFILES_3), $(RM) $(MANPAGES_DESTDIR_3)/$(f))
 
-.PHONY: all html clean compress clobber cstyle install uninstall
+.PHONY: all html clean compress clobber cstyle install uninstall install-cpp\
+	uninstall-cpp doxygen_docs
