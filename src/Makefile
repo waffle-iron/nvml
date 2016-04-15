@@ -144,7 +144,7 @@ install-cpp:
 
 install: install-cpp
 
-unistall-cpp:
+uninstall-cpp:
 	$(RM) -r $(CPP_HEADERS_DESTDIR)
 
 uninstall: uninstall-cpp
