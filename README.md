@@ -188,7 +188,7 @@ To test the libraries with AddressSanitizer and UndefinedBehaviorSanitizer, run:
 
 If you want to build/install experimental packages run:
 ```
-	$ make EXPERIMENTAL=y [install,rmp,dpkg]
+	$ make EXPERIMENTAL=y [install,rpm,dpkg]
 ```
 
 ### Contacts ###

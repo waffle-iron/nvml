@@ -57,7 +57,7 @@ DOXYGEN_HTMLDIR=cpp_html
 MANPAGES_DESTDIR_1 = $(DESTDIR)$(man1dir)
 MANPAGES_DESTDIR_3 = $(DESTDIR)$(man3dir)
 DOCS_DESTDIR = $(DESTDIR)$(docdir)
-CPP_DOCS_DESTDIR = $(DOCS_DESTDIR)/libcppobj-dev
+CPP_DOCS_DESTDIR = $(DOCS_DESTDIR)/libpmemobj++-dev
 
 all: $(TXTFILES)
 

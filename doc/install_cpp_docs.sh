@@ -44,10 +44,10 @@ function usage() {
 if [ $# -ne 2 ]
 then
 	usage;
-    exit 1;
+	exit 1;
 fi
 
 cd $1
-for file in $(find . -type f ); do
-    install -m 0644 -D ${file} $2/${file}
+for file in $(find . -type f); do
+	install -m 0644 -D ${file} $2/${file}
 done

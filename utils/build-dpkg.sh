@@ -75,16 +75,16 @@ function convert_changelog() {
 }
 
 function experimental_install_triggers_overrides() {
-cat << EOF > debian/libcppobj-dev.install
+cat << EOF > debian/libpmemobj++-dev.install
 usr/include/libpmemobj/*.hpp
-usr/share/doc/libcppobj-dev/*
+usr/share/doc/libpmemobj++-dev/*
 EOF
 
-cat << EOF > debian/libcppobj-dev.triggers
+cat << EOF > debian/libpmemobj++-dev.triggers
 interest doc-base
 EOF
 
-cat << EOF > debian/libcppobj-dev.lintian-overrides
+cat << EOF > debian/libpmemobj++-dev.lintian-overrides
 $ITP_BUG_EXCUSE
 new-package-should-close-itp-bug
 # The following warnings are triggered by a bug in debhelper:
@@ -93,23 +93,23 @@ postinst-has-useless-call-to-ldconfig
 postrm-has-useless-call-to-ldconfig
 EOF
 
-cat << EOF > debian/libcppobj-dev.doc-base
-Document: libcppobj-dev
+cat << EOF > debian/libpmemobj++-dev.doc-base
+Document: libpmemobj++-dev
 Title: NVML libpmemobj C++ bindings Manual
 Author: NVML Developers
 Abstract: This is the HTML docs for the C++ bindings for NVML's libpmemobj.
 Section: Programming
 
 Format: HTML
-Index: /usr/share/doc/libcppobj-dev/index.html
-Files: /usr/share/doc/libcppobj-dev/*
+Index: /usr/share/doc/libpmemobj++-dev/index.html
+Files: /usr/share/doc/libpmemobj++-dev/*
 EOF
 }
 
 function append_experimental_control() {
 cat << EOF >> $CONTROL_FILE
 
-Package: libcppobj-dev
+Package: libpmemobj++-dev
 Section: libdevel
 Architecture: any
 Depends: libpmemobj-dev (=\${binary:Version}), \${shlibs:Depends}, \${misc:Depends}
@@ -547,7 +547,7 @@ EOF
 
 # Experimental features
 if [ "${EXPERIMENTAL}" = "y" ]
-	then
+then
 	append_experimental_control;
 	experimental_install_triggers_overrides;
 fi

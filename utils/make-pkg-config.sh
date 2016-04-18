@@ -134,13 +134,13 @@ Libs: -L\${libdir} -lvmmalloc
 Cflags: -I\${includedir}
 EOF
 
-cat << EOF > libcppobj.pc
+cat << EOF > libpmemobj++.pc
 prefix=${prefix}
 libdir=${libdir}
 version=${version}
 includedir=\${prefix}/include/libpmemobj
 
-Name: libcppobj
+Name: libpmemobj++
 Description: C++ bindings for the libpmemobj library from NVML project
 Version: \${version}
 URL: http://pmem.io/nvml

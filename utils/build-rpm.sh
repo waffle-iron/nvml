@@ -76,18 +76,18 @@ function create_changelog() {
 function add_experimental_packages() {
 cat << EOF >> $RPM_SPEC_FILE
 
-%package -n libcppobj-devel
+%package -n libpmemobj++-devel
 Summary: C++ bindings for libpmemobj
 Group: Development/Libraries
 Requires: libpmemobj-devel = %version
-%description -n libcppobj-devel
+%description -n libpmemobj++-devel
 Development files for NVML C++ libpmemobj bindings
 
-%files -n libcppobj-devel
+%files -n libpmemobj++-devel
 %defattr(-,root,root,-)
-%{_libdir}/pkgconfig/libcppobj.pc
+%{_libdir}/pkgconfig/libpmemobj++.pc
 %{_includedir}/libpmemobj/*.hpp
-%{_docdir}/libcppobj-dev/*
+%{_docdir}/libpmemobj++-dev/*
 EOF
 }
 
@@ -400,7 +400,7 @@ EOF
 
 # Experimental features
 if [ "${EXPERIMENTAL}" = "y" ]
-	then
+then
 	add_experimental_packages;
 fi
 
