@@ -258,6 +258,7 @@ clean   : TARGET = clean
 clobber : TARGET = clobber
 test    : TARGET = test
 cstyle  : TARGET = cstyle
+format  : TARGET = format
 check   : TARGET = check
 pcheck  : TARGET = pcheck
 
@@ -272,7 +273,7 @@ ifeq ($(CHECK_POOL),y)
 CHECK_POOL_OPT="-c"
 endif
 
-all test cstyle: $(TESTS_BUILD)
+all test cstyle format: $(TESTS_BUILD)
 
 clean clobber: $(TESTS_BUILD)
 
@@ -333,4 +334,4 @@ pcheck_vmmalloc: $(VMMALLOC_TESTS)
 
 .PHONY: all check clean clobber cstyle pcheck pcheck_blk pcheck_log pcheck_obj\
         pcheck_other pcheck_pmem pcheck_pmempool pcheck_vmem pcheck_vmmalloc\
-        test unittest tools $(TESTS_BUILD)
+        test unittest tools format $(TESTS_BUILD)

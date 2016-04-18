@@ -90,4 +90,4 @@ uninstall:
 	$(foreach f, $(GZFILES_1), $(RM) $(MANPAGES_DESTDIR_1)/$(f))
 	$(foreach f, $(GZFILES_3), $(RM) $(MANPAGES_DESTDIR_3)/$(f))
 
-.PHONY: all html clean compress clobber cstyle install uninstall
+.PHONY: all html clean compress clobber install uninstall

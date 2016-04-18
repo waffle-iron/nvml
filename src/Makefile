@@ -71,6 +71,7 @@ uninstall: $(INSTALL_TARGETS:=-uninstall)
 clean: $(CLEAN_TARGETS:=-clean)
 clobber: $(CLOBBER_TARGETS:=-clobber)
 cstyle: $(CSTYLE_TARGETS:=-cstyle)
+format: $(CSTYLE_TARGETS:=-format)
 examples benchmarks: $(TARGETS)
 benchmarks: examples
 
@@ -83,32 +84,12 @@ libpmemblk libpmemlog libpmemobj: libpmem
 pkg-config:
 	@$(MAKE_PKG_CONFIG) "$(prefix)" "$(libdir)" "$(SRCVERSION)"
 
-%-install: %
-	$(MAKE) -C $* install
-ifeq ($(custom_build),)
-	$(MAKE) -C $* install DEBUG=1
-endif
-
-%-uninstall:
-	$(MAKE) -C $* uninstall
-ifeq ($(custom_build),)
-	$(MAKE) -C $* uninstall DEBUG=1
-endif
-
-%-clean:
-	$(MAKE) -C $* clean
-ifeq ($(custom_build),)
-	$(MAKE) -C $* clean DEBUG=1
-endif
-
-%-clobber:
-	$(MAKE) -C $* clobber
-ifeq ($(custom_build),)
-	$(MAKE) -C $* clobber DEBUG=1
-endif
-
-%-cstyle:
-	$(MAKE) -C $* cstyle
+$(eval $(call sub-target,$(INSTALL_TARGETS),install,y))
+$(eval $(call sub-target,$(INSTALL_TARGETS),uninstall,y))
+$(eval $(call sub-target,$(CLEAN_TARGETS),clean,y))
+$(eval $(call sub-target,$(CLOBBER_TARGETS),clobber,y))
+$(eval $(call sub-target,$(CSTYLE_TARGETS),cstyle,n))
+$(eval $(call sub-target,$(CSTYLE_TARGETS),format,n))
 
 $(ALL_TARGETS):
 	$(MAKE) -C $@
@@ -141,7 +122,11 @@ uninstall:
 	$(foreach f, $(PKG_CONFIG_FILES), $(RM) $(PKG_CONFIG_DESTDIR)/$(notdir $(f)))
 
 cstyle:
-	$(CSTYLE) include/*.h
+	$(STYLE_CHECK) check include/*.h
+	$(STYLE_CHECK) check include/libpmemobj/*.hpp
+
+format:
+	$(STYLE_CHECK) format include/libpmemobj/*.hpp
 
 cscope:
 	cscope -q -b $(SCOPEFILES)
@@ -152,6 +137,6 @@ clean:
 
 .NOTPARALLEL: libvmem libvmmalloc
 
-.PHONY: all install uninstall clean clobber cstyle test check pcheck\
+.PHONY: all install uninstall clean clobber cstyle format test check pcheck\
 	jemalloc jemalloc-clean jemalloc-test jemalloc-check cscope $(ALL_TARGETS)\
 	pkg-config

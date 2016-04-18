@@ -1,4 +1,5 @@
-# Copyright 2014-2016, Intel Corporation
+#!/bin/bash -e
+# Copyright 2016, Intel Corporation
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,36 +29,74 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# Makefile -- top Makefile for tools
+# utils/style_check.sh -- common style checking script
 #
-#include ../common.inc
+ARGS=("$@")
+CSTYLE_ARGS=()
+CLANG_ARGS=()
+CHECK_TYPE=$1
 
-TARGETS = pmempool rpmemd
-SCOPEDIRS=$(TARGETS)
-SCOPEFILES=$(foreach dir, $(SCOPEDIRS), $(shell find $(dir) -name *.[ch] ))
+function usage() {
+	echo "$0 <check|format> [C/C++ files]"
+}
 
-all    : TARGET = all
-check  : TARGET = check
-test   : TARGET = test
-clean  : TARGET = clean
-clobber: TARGET = clobber
-cstyle : TARGET = cstyle
-format : TARGET = format
-install: TARGET = install
-uninstall: TARGET = uninstall
+function run_cstyle() {
+	if [ $# -eq 0 ]; then
+		return
+	fi
 
-all clean clobber cstyle install uninstall check format test: $(TARGETS)
+	${cstyle_bin} -pP $@
+}
 
-$(TARGETS):
-	$(MAKE) -C $@ $(TARGET)
+function run_clang_check() {
+	if [ $# -eq 0 ]; then
+		return
+	fi
 
-clean:
-	$(RM) TAGS cscope.in.out cscope.out cscope.po.out
+	for file in $@
+	do
+		clang-format -style=file $file | git diff --no-index $file -
+	done
+}
 
-clobber: clean
+function run_clang_format() {
+	if [ $# -eq 0 ]; then
+		return
+	fi
 
-cscope:
-	cscope -q -b $(SCOPEFILES)
-	ctags -e $(SCOPEFILES)
+	clang-format -style=file -i $@
+}
 
-.PHONY: all clean clobber cstyle format install uninstall common cscope $(TARGETS)
+for ((i=1; i<$#; i++)) {
+	case ${ARGS[$i]} in
+		*.[ch]pp)
+		CLANG_ARGS+="${ARGS[$i]} "
+		;;
+
+		*.[ch])
+		CSTYLE_ARGS+="${ARGS[$i]} "
+		;;
+
+		*)
+		echo "Unknown argument"
+		exit 1
+		;;
+	esac
+}
+
+case $CHECK_TYPE in
+	check)
+	run_cstyle ${CSTYLE_ARGS}
+	run_clang_check ${CLANG_ARGS}
+	;;
+
+	format)
+	run_clang_format ${CLANG_ARGS}
+	;;
+
+	*)
+	echo "Invalid parameters"
+	usage
+	exit 1
+	;;
+esac

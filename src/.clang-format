@@ -1,0 +1,15 @@
+BasedOnStyle: LLVM
+IndentWidth: 8
+UseTab: Always
+BreakBeforeBraces: Linux
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: false
+AlwaysBreakAfterDefinitionReturnType: true
+SpaceBeforeParens: ControlStatements
+SpacesBeforeTrailingComments: 1
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+PointerAlignment: Right
+ContinuationIndentWidth: 8
+AlignOperands: false
+IndentCaseLabels: true

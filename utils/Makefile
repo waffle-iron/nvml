@@ -45,4 +45,7 @@ clobber:
 cstyle:
 	$(MAKE) -C check_license $@
 
-.PHONY: all check-license clean clobber cstyle
+format:
+	$(MAKE) -C check_license $@
+
+.PHONY: all check-license clean clobber cstyle format

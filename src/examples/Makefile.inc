@@ -88,11 +88,6 @@ ifneq ($(LIBRARIES),)
 	$(RM) $(DYNAMIC_LIBRARIES) $(STATIC_LIBRARIES)
 endif
 
-cstyle:
-ifneq ($(PROGS)$(LIBRARIES),)
-	$(CSTYLE) *.[ch]
-endif
-
 clean-progs clean-libraries:
 	$(RM) *.o
 
