@@ -84,7 +84,7 @@ clobber: clean
 
 ifeq ($(EXPERIMENTAL),y)
 install-cpp: doxygen_docs
-	./install_cpp_docs.sh $(DOXYGEN_HTMLDIR) $(CPP_DOCS_DESTDIR)
+	$(call install_recursive,$(DOXYGEN_HTMLDIR),0644,$(CPP_DOCS_DESTDIR))
 
 install: install-cpp
 

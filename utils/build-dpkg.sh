@@ -113,7 +113,7 @@ Package: libpmemobj++-dev
 Section: libdevel
 Architecture: any
 Depends: libpmemobj-dev (=\${binary:Version}), \${shlibs:Depends}, \${misc:Depends}
-Description: C++ bindings for libpmemobj
+Description: C++ bindings for libpmemobj (EXPERIMENTAL)
  Headers-only C++ library for libpmemobj.
 EOF
 }

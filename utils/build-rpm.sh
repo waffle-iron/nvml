@@ -81,7 +81,7 @@ Summary: C++ bindings for libpmemobj
 Group: Development/Libraries
 Requires: libpmemobj-devel = %version
 %description -n libpmemobj++-devel
-Development files for NVML C++ libpmemobj bindings
+Development files for NVML C++ libpmemobj bindings - EXPERIMENTAL
 
 %files -n libpmemobj++-devel
 %defattr(-,root,root,-)
