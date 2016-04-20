@@ -55,7 +55,10 @@ function run_clang_check() {
 
 	for file in $@
 	do
-		clang-format -style=file $file | git diff --no-index $file -
+		LINES=$(clang-format -style=file $file | git diff --no-index $file - | wc -l)
+		if [ $LINES -ne 0 ]; then
+			clang-format -style=file $file | git diff --no-index $file -
+		fi
 	done
 }
 
