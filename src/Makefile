@@ -124,9 +124,11 @@ uninstall:
 cstyle:
 	$(STYLE_CHECK) check include/*.h
 	$(STYLE_CHECK) check include/libpmemobj/*.hpp
+	$(STYLE_CHECK) check include/libpmemobj/detail/*.hpp
 
 format:
 	$(STYLE_CHECK) format include/libpmemobj/*.hpp
+	$(STYLE_CHECK) format include/libpmemobj/detail/*.hpp
 
 cscope:
 	cscope -q -b $(SCOPEFILES)
