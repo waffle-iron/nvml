@@ -46,14 +46,15 @@
 
 using namespace nvml::obj;
 
-namespace {
+namespace
+{
 
 const int TEST_ARR_SIZE = 10;
 
 /*
  * prepare_array -- preallocate and fill a persistent array
  */
-template<typename T>
+template <typename T>
 persistent_ptr<T>
 prepare_array(PMEMobjpool *pop)
 {
@@ -61,19 +62,19 @@ prepare_array(PMEMobjpool *pop)
 
 	persistent_ptr<T> parr_vsize;
 	ret = pmemobj_alloc(pop, parr_vsize.raw_ptr(),
-		sizeof (T) * TEST_ARR_SIZE,
-		0, NULL, NULL);
+			    sizeof(T) * TEST_ARR_SIZE, 0, NULL, NULL);
 	UT_ASSERTeq(ret, 0);
 
 	T *parray = parr_vsize.get();
 
-	TX_BEGIN(pop) {
+	TX_BEGIN(pop)
+	{
 		for (int i = 0; i < TEST_ARR_SIZE; ++i) {
 			parray[i] = i;
 		}
-	} TX_ONABORT {
-		UT_FATAL("Transactional prepare_array aborted");
-	} TX_END;
+	}
+	TX_ONABORT { UT_FATAL("Transactional prepare_array aborted"); }
+	TX_END;
 
 	for (int i = 0; i < TEST_ARR_SIZE; ++i) {
 		UT_ASSERTeq(parray[i], i);
@@ -157,8 +158,8 @@ test_relational(PMEMobjpool *pop)
 	UT_ASSERT(first_elem != last_elem);
 	UT_ASSERT(first_elem <= last_elem);
 	UT_ASSERT(first_elem < last_elem);
-	UT_ASSERT(last_elem > first_elem );
-	UT_ASSERT(last_elem >= first_elem );
+	UT_ASSERT(last_elem > first_elem);
+	UT_ASSERT(last_elem >= first_elem);
 	UT_ASSERT(first_elem == first_elem);
 	UT_ASSERT(first_elem >= first_elem);
 	UT_ASSERT(first_elem <= first_elem);
@@ -196,12 +197,11 @@ test_relational(PMEMobjpool *pop)
 	UT_ASSERT(nullptr >= parray);
 
 	persistent_ptr<p<double>> different_array =
-			prepare_array<p<double>>(pop);
+		prepare_array<p<double>>(pop);
 
 	/* only verify if this compiles */
 	UT_ASSERT((first_elem < different_array) || true);
 }
-
 }
 
 int
@@ -217,7 +217,7 @@ main(int argc, char *argv[])
 	PMEMobjpool *pop = NULL;
 
 	if ((pop = pmemobj_create(path, LAYOUT, PMEMOBJ_MIN_POOL,
-			S_IWUSR | S_IRUSR)) == NULL)
+				  S_IWUSR | S_IRUSR)) == NULL)
 		UT_FATAL("!pmemobj_create: %s", path);
 
 	test_arith(pop);

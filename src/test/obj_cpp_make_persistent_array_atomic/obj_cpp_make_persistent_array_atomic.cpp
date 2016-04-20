@@ -46,13 +46,16 @@
 
 using namespace nvml::obj;
 
-namespace {
+namespace
+{
 
 const int TEST_ARR_SIZE = 10;
 
-class foo {
-public:
-	foo() : bar(1) {
+class foo
+{
+      public:
+	foo() : bar(1)
+	{
 		for (int i = 0; i < TEST_ARR_SIZE; ++i)
 			this->arr[i] = 1;
 	}
@@ -60,7 +63,8 @@ public:
 	/*
 	 * Assert values of foo.
 	 */
-	void check_foo()
+	void
+	check_foo()
 	{
 		UT_ASSERTeq(1, this->bar);
 		for (int i = 0; i < TEST_ARR_SIZE; ++i)
@@ -77,9 +81,11 @@ struct root {
 	persistent_ptr<foo[]> pfoo;
 };
 
-class bar {
-public:
-	bar() {
+class bar
+{
+      public:
+	bar()
+	{
 		/* throw any exception */
 		throw 1;
 	}
@@ -166,7 +172,6 @@ test_constructor_exception(pool_base &pop)
 
 	UT_ASSERT(except);
 }
-
 }
 
 int
@@ -183,7 +188,7 @@ main(int argc, char *argv[])
 
 	try {
 		pop = pool<struct root>::create(path, LAYOUT, PMEMOBJ_MIN_POOL,
-			S_IWUSR | S_IRUSR);
+						S_IWUSR | S_IRUSR);
 	} catch (nvml::pool_error &pe) {
 		UT_FATAL("!pool::create: %s %s", pe.what(), path);
 	}

@@ -44,7 +44,8 @@
 
 using namespace nvml::obj;
 
-namespace {
+namespace
+{
 
 /*
  * test_null_ptr -- verifies if the pointer correctly behaves like a NULL-value
@@ -129,14 +130,13 @@ test_ptr_atomic(PMEMobjpool *pop)
 
 	persistent_ptr<foo> pfoo;
 
-	ret = pmemobj_alloc(pop, pfoo.raw_ptr(), sizeof (foo),
-		0, NULL, NULL);
+	ret = pmemobj_alloc(pop, pfoo.raw_ptr(), sizeof(foo), 0, NULL, NULL);
 
 	UT_ASSERTeq(ret, 0);
 	UT_ASSERTne(pfoo.get(), NULL);
 
 	(*pfoo).bar = TEST_INT;
-	memset(&pfoo->arr, TEST_CHAR, sizeof (pfoo->arr));
+	memset(&pfoo->arr, TEST_CHAR, sizeof(pfoo->arr));
 
 	for (auto c : pfoo->arr) {
 		UT_ASSERTeq(c, TEST_CHAR);
@@ -154,46 +154,49 @@ test_ptr_atomic(PMEMobjpool *pop)
 void
 test_ptr_transactional(PMEMobjpool *pop)
 {
-	persistent_ptr<root> r = pmemobj_root(pop, sizeof (root));
+	persistent_ptr<root> r = pmemobj_root(pop, sizeof(root));
 
-	TX_BEGIN(pop) {
+	TX_BEGIN(pop)
+	{
 		UT_ASSERT(r->pfoo == nullptr);
 
-		r->pfoo = pmemobj_tx_alloc(sizeof (foo), 0);
-
-	} TX_ONABORT {
-		UT_ASSERT(0);
-	} TX_END
+		r->pfoo = pmemobj_tx_alloc(sizeof(foo), 0);
+	}
+	TX_ONABORT { UT_ASSERT(0); }
+	TX_END
 
 	persistent_ptr<foo> pfoo = r->pfoo;
 
-	TX_BEGIN(pop) {
+	TX_BEGIN(pop)
+	{
 		pfoo->bar = TEST_INT;
-		memset(&pfoo->arr, TEST_CHAR, sizeof (pfoo->arr));
-	} TX_ONABORT {
-		UT_ASSERT(0);
-	} TX_END
+		memset(&pfoo->arr, TEST_CHAR, sizeof(pfoo->arr));
+	}
+	TX_ONABORT { UT_ASSERT(0); }
+	TX_END
 
 	UT_ASSERTeq(pfoo->bar, TEST_INT);
 	for (auto c : pfoo->arr) {
 		UT_ASSERTeq(c, TEST_CHAR);
 	}
 
-	TX_BEGIN(pop) {
+	TX_BEGIN(pop)
+	{
 		pfoo->bar = 0;
 		pmemobj_tx_abort(-1);
-	} TX_ONCOMMIT {
-		UT_ASSERT(0);
-	} TX_END
+	}
+	TX_ONCOMMIT { UT_ASSERT(0); }
+	TX_END
 
 	UT_ASSERTeq(pfoo->bar, TEST_INT);
 
-	TX_BEGIN(pop) {
+	TX_BEGIN(pop)
+	{
 		pmemobj_tx_free(pfoo.raw());
 		r->pfoo = nullptr;
-	} TX_ONABORT {
-		UT_ASSERT(0);
-	} TX_END
+	}
+	TX_ONABORT { UT_ASSERT(0); }
+	TX_END
 
 	UT_ASSERT(r->pfoo == nullptr);
 }
@@ -208,8 +211,7 @@ test_ptr_array(PMEMobjpool *pop)
 
 	persistent_ptr<p<int>[]> parr_vsize;
 	ret = pmemobj_alloc(pop, parr_vsize.raw_ptr(),
-		sizeof (int) * TEST_ARR_SIZE,
-		0, NULL, NULL);
+			    sizeof(int) * TEST_ARR_SIZE, 0, NULL, NULL);
 	UT_ASSERTeq(ret, 0);
 
 	for (int i = 0; i < TEST_ARR_SIZE; ++i)
@@ -218,29 +220,30 @@ test_ptr_array(PMEMobjpool *pop)
 	for (int i = 0; i < TEST_ARR_SIZE; ++i)
 		UT_ASSERTeq(parr_vsize[i], i);
 
-	persistent_ptr<root> r = pmemobj_root(pop, sizeof (root));
+	persistent_ptr<root> r = pmemobj_root(pop, sizeof(root));
 
-	TX_BEGIN(pop) {
-		r->parr = pmemobj_tx_zalloc(sizeof (int) * TEST_ARR_SIZE, 0);
-	} TX_ONABORT {
-		UT_ASSERT(0);
-	} TX_END
+	TX_BEGIN(pop)
+	{
+		r->parr = pmemobj_tx_zalloc(sizeof(int) * TEST_ARR_SIZE, 0);
+	}
+	TX_ONABORT { UT_ASSERT(0); }
+	TX_END
 
 	UT_ASSERT(r->parr != nullptr);
 
-	TX_BEGIN(pop) {
+	TX_BEGIN(pop)
+	{
 		for (int i = 0; i < TEST_ARR_SIZE; ++i)
 			r->parr[i] = TEST_INT;
 
 		pmemobj_tx_abort(-1);
-	} TX_ONCOMMIT {
-		UT_ASSERT(0);
-	} TX_END
+	}
+	TX_ONCOMMIT { UT_ASSERT(0); }
+	TX_END
 
 	for (int i = 0; i < TEST_ARR_SIZE; ++i)
 		UT_ASSERTeq(r->parr[i], 0);
 }
-
 }
 
 int
@@ -255,7 +258,8 @@ main(int argc, char *argv[])
 
 	PMEMobjpool *pop = NULL;
 
-	if ((pop = pmemobj_create(path, LAYOUT, PMEMOBJ_MIN_POOL, S_IWUSR | S_IRUSR)) == NULL)
+	if ((pop = pmemobj_create(path, LAYOUT, PMEMOBJ_MIN_POOL,
+				  S_IWUSR | S_IRUSR)) == NULL)
 		UT_FATAL("!pmemobj_create: %s", path);
 
 	test_ptr_operators_null();
