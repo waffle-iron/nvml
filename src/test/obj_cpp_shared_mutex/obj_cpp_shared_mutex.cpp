@@ -66,7 +66,7 @@ const int num_threads = 30;
  * writer -- (internal) bump up the counter by 2
  */
 void
-writer(persistent_ptr<struct root> proot)
+writer(persistent_ptr<root> proot)
 {
 	for (int i = 0; i < num_ops; ++i) {
 		std::lock_guard<shared_mutex> lock(proot->pmutex);
@@ -79,7 +79,7 @@ writer(persistent_ptr<struct root> proot)
  * reader -- (internal) verify if the counter is even
  */
 void
-reader(persistent_ptr<struct root> proot)
+reader(persistent_ptr<root> proot)
 {
 	for (int i = 0; i < num_ops; ++i) {
 		proot->pmutex.lock_shared();
@@ -92,7 +92,7 @@ reader(persistent_ptr<struct root> proot)
  * writer_trylock -- (internal) trylock bump the counter by 2
  */
 void
-writer_trylock(persistent_ptr<struct root> proot)
+writer_trylock(persistent_ptr<root> proot)
 {
 	for (;;) {
 		if (proot->pmutex.try_lock()) {
@@ -108,7 +108,7 @@ writer_trylock(persistent_ptr<struct root> proot)
  * reader_trylock -- (internal) trylock verify that the counter is even
  */
 void
-reader_trylock(persistent_ptr<struct root> proot)
+reader_trylock(persistent_ptr<root> proot)
 {
 	for (;;) {
 		if (proot->pmutex.try_lock_shared()) {
@@ -124,12 +124,12 @@ reader_trylock(persistent_ptr<struct root> proot)
  */
 template <typename Worker>
 void
-mutex_test(pool<struct root> &pop, const Worker &writer, const Worker &reader)
+mutex_test(pool<root> &pop, const Worker &writer, const Worker &reader)
 {
 	const int total_threads = num_threads * 2;
 	std::thread threads[total_threads];
 
-	persistent_ptr<struct root> proot = pop.get_root();
+	persistent_ptr<root> proot = pop.get_root();
 
 	for (int i = 0; i < total_threads; i += 2) {
 		threads[i] = std::thread(writer, proot);
@@ -151,11 +151,11 @@ main(int argc, char *argv[])
 
 	const char *path = argv[1];
 
-	pool<struct root> pop;
+	pool<root> pop;
 
 	try {
-		pop = pool<struct root>::create(path, LAYOUT, PMEMOBJ_MIN_POOL,
-						S_IWUSR | S_IRUSR);
+		pop = pool<root>::create(path, LAYOUT, PMEMOBJ_MIN_POOL,
+					 S_IWUSR | S_IRUSR);
 	} catch (nvml::pool_error &pe) {
 		UT_FATAL("!pool::create: %s %s", pe.what(), path);
 	}

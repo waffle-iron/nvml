@@ -40,6 +40,7 @@
 #include <libpmemobj/p.hpp>
 #include <libpmemobj/pool.hpp>
 #include <libpmemobj/make_persistent_array.hpp>
+#include <libpmemobj/transaction.hpp>
 
 #define LAYOUT "cpp"
 
@@ -175,6 +176,7 @@ test_abort_revert(pool_base &pop)
 		UT_ASSERT(0);
 	}
 
+	bool exception_thrown = false;
 	try {
 		transaction::exec_tx(pop, [&] {
 			UT_ASSERT(r->pfoo != nullptr);
@@ -183,10 +185,13 @@ test_abort_revert(pool_base &pop)
 
 			transaction::abort(EINVAL);
 		});
+	} catch (nvml::manual_tx_abort &ma) {
+		exception_thrown = true;
 	} catch (...) {
-		/* eat the exception */
+		UT_ASSERT(0);
 	}
 
+	UT_ASSERT(exception_thrown);
 	UT_ASSERT(r->pfoo != nullptr);
 	for (int i = 0; i < 5; ++i)
 		r->pfoo[i].check_foo();

@@ -167,6 +167,7 @@ test_additional_delete(pool<struct root> &pop)
 		UT_ASSERT(0);
 	}
 
+	bool exception_thrown = false;
 	try {
 		transaction::exec_tx(pop, [&] {
 			UT_ASSERT(r->pfoo != nullptr);
@@ -177,10 +178,13 @@ test_additional_delete(pool<struct root> &pop)
 
 			transaction::abort(EINVAL);
 		});
+	} catch (nvml::manual_tx_abort &ma) {
+		exception_thrown = true;
 	} catch (...) {
-		/* eat the exception */
+		UT_ASSERT(0);
 	}
 
+	UT_ASSERT(exception_thrown);
 	UT_ASSERT(r->pfoo != nullptr);
 	r->pfoo->check_foo(1, 1);
 

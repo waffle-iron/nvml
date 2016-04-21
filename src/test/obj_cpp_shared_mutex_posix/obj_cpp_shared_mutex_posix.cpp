@@ -68,8 +68,7 @@ const int num_threads = 30;
 void *
 writer(void *arg)
 {
-	persistent_ptr<struct root> *proot =
-		static_cast<persistent_ptr<struct root> *>(arg);
+	persistent_ptr<root> *proot = static_cast<persistent_ptr<root> *>(arg);
 
 	for (int i = 0; i < num_ops; ++i) {
 		std::lock_guard<shared_mutex> lock((*proot)->pmutex);
@@ -85,8 +84,7 @@ writer(void *arg)
 void *
 reader(void *arg)
 {
-	persistent_ptr<struct root> *proot =
-		static_cast<persistent_ptr<struct root> *>(arg);
+	persistent_ptr<root> *proot = static_cast<persistent_ptr<root> *>(arg);
 	for (int i = 0; i < num_ops; ++i) {
 		(*proot)->pmutex.lock_shared();
 		UT_ASSERTeq((*proot)->counter % 2, 0);
@@ -101,8 +99,7 @@ reader(void *arg)
 void *
 writer_trylock(void *arg)
 {
-	persistent_ptr<struct root> *proot =
-		static_cast<persistent_ptr<struct root> *>(arg);
+	persistent_ptr<root> *proot = static_cast<persistent_ptr<root> *>(arg);
 	for (;;) {
 		if ((*proot)->pmutex.try_lock()) {
 			--((*proot)->counter);
@@ -120,8 +117,7 @@ writer_trylock(void *arg)
 void *
 reader_trylock(void *arg)
 {
-	persistent_ptr<struct root> *proot =
-		static_cast<persistent_ptr<struct root> *>(arg);
+	persistent_ptr<root> *proot = static_cast<persistent_ptr<root> *>(arg);
 	for (;;) {
 		if ((*proot)->pmutex.try_lock_shared()) {
 			UT_ASSERTeq((*proot)->counter % 2, 0);
@@ -137,12 +133,12 @@ reader_trylock(void *arg)
  */
 template <typename Worker>
 void
-mutex_test(pool<struct root> &pop, Worker writer, Worker reader)
+mutex_test(pool<root> &pop, Worker writer, Worker reader)
 {
 	const int total_threads = num_threads * 2;
 	pthread_t threads[total_threads];
 
-	persistent_ptr<struct root> proot = pop.get_root();
+	persistent_ptr<root> proot = pop.get_root();
 
 	for (int i = 0; i < total_threads; i += 2) {
 		PTHREAD_CREATE(&threads[i], nullptr, writer, &proot);
@@ -164,11 +160,11 @@ main(int argc, char *argv[])
 
 	const char *path = argv[1];
 
-	pool<struct root> pop;
+	pool<root> pop;
 
 	try {
-		pop = pool<struct root>::create(path, LAYOUT, PMEMOBJ_MIN_POOL,
-						S_IWUSR | S_IRUSR);
+		pop = pool<root>::create(path, LAYOUT, PMEMOBJ_MIN_POOL,
+					 S_IWUSR | S_IRUSR);
 	} catch (nvml::pool_error &pe) {
 		UT_FATAL("!pool::create: %s %s", pe.what(), path);
 	}

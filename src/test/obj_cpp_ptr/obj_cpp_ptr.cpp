@@ -38,7 +38,12 @@
 #include "unittest.h"
 
 #include <libpmemobj/persistent_ptr.hpp>
+#include <libpmemobj/make_persistent_atomic.hpp>
+#include <libpmemobj/make_persistent_array_atomic.hpp>
+#include <libpmemobj/make_persistent.hpp>
 #include <libpmemobj/p.hpp>
+#include <libpmemobj/pool.hpp>
+#include <libpmemobj/transaction.hpp>
 
 #define LAYOUT "cpp"
 
@@ -97,9 +102,9 @@ test_ptr_operators_null()
 	test_null_ptr(temp_ptr);
 }
 
-#define TEST_INT 10
-#define TEST_ARR_SIZE 10
-#define TEST_CHAR 'a'
+const int TEST_INT = 10;
+const size_t TEST_ARR_SIZE = 10;
+const char TEST_CHAR = 'a';
 
 struct foo {
 	p<int> bar;
@@ -124,13 +129,17 @@ struct root {
  * test_ptr_atomic -- verifies the persistent ptr with the atomic C API
  */
 void
-test_ptr_atomic(PMEMobjpool *pop)
+test_ptr_atomic(pool<root> &pop)
 {
 	int ret;
 
 	persistent_ptr<foo> pfoo;
 
-	ret = pmemobj_alloc(pop, pfoo.raw_ptr(), sizeof(foo), 0, NULL, NULL);
+	try {
+		make_persistent_atomic<foo>(pop, pfoo);
+	} catch (...) {
+		UT_ASSERT(0);
+	}
 
 	UT_ASSERTeq(ret, 0);
 	UT_ASSERTne(pfoo.get(), NULL);
@@ -142,9 +151,12 @@ test_ptr_atomic(PMEMobjpool *pop)
 		UT_ASSERTeq(c, TEST_CHAR);
 	}
 
-	pmemobj_free(pfoo.raw_ptr());
+	try {
+		delete_persistent_atomic<foo>(pfoo);
+	} catch (...) {
+		UT_ASSERT(0);
+	}
 
-	UT_ASSERTeq(ret, 0);
 	UT_ASSERTeq(pfoo.get(), NULL);
 }
 
@@ -152,67 +164,75 @@ test_ptr_atomic(PMEMobjpool *pop)
  * test_ptr_transactional -- verifies the persistent ptr with the tx C API
  */
 void
-test_ptr_transactional(PMEMobjpool *pop)
+test_ptr_transactional(pool<root> &pop)
 {
-	persistent_ptr<root> r = pmemobj_root(pop, sizeof(root));
+	auto r = pop.get_root();
 
-	TX_BEGIN(pop)
-	{
-		UT_ASSERT(r->pfoo == nullptr);
+	try {
+		transaction::exec_tx(pop, [&] {
+			UT_ASSERT(r->pfoo == nullptr);
 
-		r->pfoo = pmemobj_tx_alloc(sizeof(foo), 0);
+			r->pfoo = make_persistent<foo>();
+		});
+	} catch (...) {
+		UT_ASSERT(0);
 	}
-	TX_ONABORT { UT_ASSERT(0); }
-	TX_END
 
-	persistent_ptr<foo> pfoo = r->pfoo;
+	auto pfoo = r->pfoo;
 
-	TX_BEGIN(pop)
-	{
-		pfoo->bar = TEST_INT;
-		memset(&pfoo->arr, TEST_CHAR, sizeof(pfoo->arr));
+	try {
+		transaction::exec_tx(pop, [&] {
+			pfoo->bar = TEST_INT;
+			memset(&pfoo->arr, TEST_CHAR, sizeof(pfoo->arr));
+		});
+	} catch (...) {
+		UT_ASSERT(0);
 	}
-	TX_ONABORT { UT_ASSERT(0); }
-	TX_END
 
 	UT_ASSERTeq(pfoo->bar, TEST_INT);
 	for (auto c : pfoo->arr) {
 		UT_ASSERTeq(c, TEST_CHAR);
 	}
 
-	TX_BEGIN(pop)
-	{
-		pfoo->bar = 0;
-		pmemobj_tx_abort(-1);
+	bool exception_thrown = false;
+	try {
+		transaction::exec_tx(pop, [&] {
+			pfoo->bar = 0;
+			transaction::abort(-1);
+		});
+	} catch (nvml::manual_tx_abort &ma) {
+		exception_thrown = true;
+	} catch (...) {
+		UT_ASSERT(0);
 	}
-	TX_ONCOMMIT { UT_ASSERT(0); }
-	TX_END
 
 	UT_ASSERTeq(pfoo->bar, TEST_INT);
 
-	TX_BEGIN(pop)
-	{
-		pmemobj_tx_free(pfoo.raw());
-		r->pfoo = nullptr;
+	try {
+		transaction::exec_tx(pop,
+				     [&] { delete_persistent<foo>(r->pfoo); });
+	} catch (...) {
+		UT_ASSERT(0);
 	}
-	TX_ONABORT { UT_ASSERT(0); }
-	TX_END
 
 	UT_ASSERT(r->pfoo == nullptr);
+	UT_ASSERT(pfoo != nullptr);
 }
 
 /*
  * test_ptr_array -- verifies the array specialization behavior
  */
 void
-test_ptr_array(PMEMobjpool *pop)
+test_ptr_array(pool<root> &pop)
 {
-	int ret;
-
 	persistent_ptr<p<int>[]> parr_vsize;
-	ret = pmemobj_alloc(pop, parr_vsize.raw_ptr(),
-			    sizeof(int) * TEST_ARR_SIZE, 0, NULL, NULL);
-	UT_ASSERTeq(ret, 0);
+
+	try {
+		make_persistent_atomic<p<int>[]>(pop, parr_vsize,
+						 TEST_ARR_SIZE);
+	} catch (...) {
+		UT_ASSERT(0);
+	}
 
 	for (int i = 0; i < TEST_ARR_SIZE; ++i)
 		parr_vsize[i] = i;
@@ -220,26 +240,50 @@ test_ptr_array(PMEMobjpool *pop)
 	for (int i = 0; i < TEST_ARR_SIZE; ++i)
 		UT_ASSERTeq(parr_vsize[i], i);
 
-	persistent_ptr<root> r = pmemobj_root(pop, sizeof(root));
+	auto r = pop.get_root();
 
-	TX_BEGIN(pop)
-	{
-		r->parr = pmemobj_tx_zalloc(sizeof(int) * TEST_ARR_SIZE, 0);
+	try {
+		transaction::exec_tx(pop, [&] {
+			r->parr = pmemobj_tx_zalloc(sizeof(int) * TEST_ARR_SIZE,
+						    0);
+		});
+	} catch (...) {
+		UT_ASSERT(0);
 	}
-	TX_ONABORT { UT_ASSERT(0); }
-	TX_END
 
 	UT_ASSERT(r->parr != nullptr);
 
-	TX_BEGIN(pop)
-	{
-		for (int i = 0; i < TEST_ARR_SIZE; ++i)
-			r->parr[i] = TEST_INT;
+	bool exception_thrown = false;
+	try {
+		transaction::exec_tx(pop, [&] {
+			for (int i = 0; i < TEST_ARR_SIZE; ++i)
+				r->parr[i] = TEST_INT;
 
-		pmemobj_tx_abort(-1);
+			transaction::abort(-1);
+		});
+	} catch (nvml::manual_tx_abort &ma) {
+		exception_thrown = true;
+	} catch (...) {
+		UT_ASSERT(0);
 	}
-	TX_ONCOMMIT { UT_ASSERT(0); }
-	TX_END
+
+	UT_ASSERT(exception_thrown);
+
+	exception_thrown = false;
+	try {
+		transaction::exec_tx(pop, [&] {
+			for (int i = 0; i < TEST_ARR_SIZE; ++i)
+				r->parr[i] = TEST_INT;
+
+			transaction::abort(-1);
+		});
+	} catch (nvml::manual_tx_abort &ma) {
+		exception_thrown = true;
+	} catch (...) {
+		UT_ASSERT(0);
+	}
+
+	UT_ASSERT(exception_thrown);
 
 	for (int i = 0; i < TEST_ARR_SIZE; ++i)
 		UT_ASSERTeq(r->parr[i], 0);
@@ -256,18 +300,21 @@ main(int argc, char *argv[])
 
 	const char *path = argv[1];
 
-	PMEMobjpool *pop = NULL;
+	pool<root> pop;
 
-	if ((pop = pmemobj_create(path, LAYOUT, PMEMOBJ_MIN_POOL,
-				  S_IWUSR | S_IRUSR)) == NULL)
-		UT_FATAL("!pmemobj_create: %s", path);
+	try {
+		pop = pool<struct root>::create(path, LAYOUT, PMEMOBJ_MIN_POOL,
+						S_IWUSR | S_IRUSR);
+	} catch (nvml::pool_error &pe) {
+		UT_FATAL("!pool::create: %s %s", pe.what(), path);
+	}
 
 	test_ptr_operators_null();
 	test_ptr_atomic(pop);
 	test_ptr_transactional(pop);
 	test_ptr_array(pop);
 
-	pmemobj_close(pop);
+	pop.close();
 
 	DONE(NULL);
 }
