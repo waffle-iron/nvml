@@ -91,6 +91,8 @@ endif
 
 LIB_PREFIX ?= lib
 
+all:
+
 cstyle-%:
 	$(STYLE_CHECK) $* $(wildcard *.[ch]) $(wildcard *.[ch]pp)
 

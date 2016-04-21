@@ -30,7 +30,6 @@
 #
 # Makefile -- top Makefile for tools
 #
-#include ../common.inc
 
 TARGETS = pmempool rpmemd
 SCOPEDIRS=$(TARGETS)
