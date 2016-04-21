@@ -20,17 +20,17 @@
  */
 
 #ifndef RB_H_
-#define	RB_H_
+#define RB_H_
 
 #ifdef RB_COMPACT
 /* Node structure. */
-#define	rb_node(a_type)							\
+#define rb_node(a_type)							\
 struct {								\
     a_type *rbn_left;							\
     a_type *rbn_right_red;						\
 }
 #else
-#define	rb_node(a_type)							\
+#define rb_node(a_type)							\
 struct {								\
     a_type *rbn_left;							\
     a_type *rbn_right;							\
@@ -39,84 +39,84 @@ struct {								\
 #endif
 
 /* Root structure. */
-#define	rb_tree(a_type)							\
+#define rb_tree(a_type)							\
 struct {								\
     a_type *rbt_root;							\
     a_type rbt_nil;							\
 }
 
 /* Left accessors. */
-#define	rbtn_left_get(a_type, a_field, a_node)				\
+#define rbtn_left_get(a_type, a_field, a_node)				\
     ((a_node)->a_field.rbn_left)
-#define	rbtn_left_set(a_type, a_field, a_node, a_left) do {		\
+#define rbtn_left_set(a_type, a_field, a_node, a_left) do {		\
     (a_node)->a_field.rbn_left = a_left;				\
 } while (0)
 
 #ifdef RB_COMPACT
 /* Right accessors. */
-#define	rbtn_right_get(a_type, a_field, a_node)				\
+#define rbtn_right_get(a_type, a_field, a_node)				\
     ((a_type *) (((intptr_t) (a_node)->a_field.rbn_right_red)		\
       & ((ssize_t)-2)))
-#define	rbtn_right_set(a_type, a_field, a_node, a_right) do {		\
+#define rbtn_right_set(a_type, a_field, a_node, a_right) do {		\
     (a_node)->a_field.rbn_right_red = (a_type *) (((uintptr_t) a_right)	\
       | (((uintptr_t) (a_node)->a_field.rbn_right_red) & ((size_t)1)));	\
 } while (0)
 
 /* Color accessors. */
-#define	rbtn_red_get(a_type, a_field, a_node)				\
+#define rbtn_red_get(a_type, a_field, a_node)				\
     ((bool) (((uintptr_t) (a_node)->a_field.rbn_right_red)		\
       & ((size_t)1)))
-#define	rbtn_color_set(a_type, a_field, a_node, a_red) do {		\
+#define rbtn_color_set(a_type, a_field, a_node, a_red) do {		\
     (a_node)->a_field.rbn_right_red = (a_type *) ((((intptr_t)		\
       (a_node)->a_field.rbn_right_red) & ((ssize_t)-2))			\
       | ((ssize_t)a_red));						\
 } while (0)
-#define	rbtn_red_set(a_type, a_field, a_node) do {			\
+#define rbtn_red_set(a_type, a_field, a_node) do {			\
     (a_node)->a_field.rbn_right_red = (a_type *) (((uintptr_t)		\
       (a_node)->a_field.rbn_right_red) | ((size_t)1));			\
 } while (0)
-#define	rbtn_black_set(a_type, a_field, a_node) do {			\
+#define rbtn_black_set(a_type, a_field, a_node) do {			\
     (a_node)->a_field.rbn_right_red = (a_type *) (((intptr_t)		\
       (a_node)->a_field.rbn_right_red) & ((ssize_t)-2));		\
 } while (0)
 #else
 /* Right accessors. */
-#define	rbtn_right_get(a_type, a_field, a_node)				\
+#define rbtn_right_get(a_type, a_field, a_node)				\
     ((a_node)->a_field.rbn_right)
-#define	rbtn_right_set(a_type, a_field, a_node, a_right) do {		\
+#define rbtn_right_set(a_type, a_field, a_node, a_right) do {		\
     (a_node)->a_field.rbn_right = a_right;				\
 } while (0)
 
 /* Color accessors. */
-#define	rbtn_red_get(a_type, a_field, a_node)				\
+#define rbtn_red_get(a_type, a_field, a_node)				\
     ((a_node)->a_field.rbn_red)
-#define	rbtn_color_set(a_type, a_field, a_node, a_red) do {		\
+#define rbtn_color_set(a_type, a_field, a_node, a_red) do {		\
     (a_node)->a_field.rbn_red = (a_red);				\
 } while (0)
-#define	rbtn_red_set(a_type, a_field, a_node) do {			\
+#define rbtn_red_set(a_type, a_field, a_node) do {			\
     (a_node)->a_field.rbn_red = true;					\
 } while (0)
-#define	rbtn_black_set(a_type, a_field, a_node) do {			\
+#define rbtn_black_set(a_type, a_field, a_node) do {			\
     (a_node)->a_field.rbn_red = false;					\
 } while (0)
 #endif
 
 /* Node initializer. */
-#define	rbt_node_new(a_type, a_field, a_rbt, a_node) do {		\
+#define rbt_node_new(a_type, a_field, a_rbt, a_node) do {		\
     rbtn_left_set(a_type, a_field, (a_node), &(a_rbt)->rbt_nil);	\
     rbtn_right_set(a_type, a_field, (a_node), &(a_rbt)->rbt_nil);	\
     rbtn_red_set(a_type, a_field, (a_node));				\
 } while (0)
 
 /* Tree initializer. */
-#define	rb_new(a_type, a_field, a_rbt) do {				\
+#define rb_new(a_type, a_field, a_rbt) do {				\
     (a_rbt)->rbt_root = &(a_rbt)->rbt_nil;				\
     rbt_node_new(a_type, a_field, a_rbt, &(a_rbt)->rbt_nil);		\
     rbtn_black_set(a_type, a_field, &(a_rbt)->rbt_nil);			\
 } while (0)
 
 /* Internal utility macros. */
-#define	rbtn_first(a_type, a_field, a_rbt, a_root, r_node) do {		\
+#define rbtn_first(a_type, a_field, a_rbt, a_root, r_node) do {		\
     (r_node) = (a_root);						\
     if ((r_node) != &(a_rbt)->rbt_nil) {				\
 	for (;								\
@@ -126,7 +126,7 @@ struct {								\
     }									\
 } while (0)
 
-#define	rbtn_last(a_type, a_field, a_rbt, a_root, r_node) do {		\
+#define rbtn_last(a_type, a_field, a_rbt, a_root, r_node) do {		\
     (r_node) = (a_root);						\
     if ((r_node) != &(a_rbt)->rbt_nil) {				\
 	for (; rbtn_right_get(a_type, a_field, (r_node)) !=		\
@@ -136,14 +136,14 @@ struct {								\
     }									\
 } while (0)
 
-#define	rbtn_rotate_left(a_type, a_field, a_node, r_node) do {		\
+#define rbtn_rotate_left(a_type, a_field, a_node, r_node) do {		\
     (r_node) = rbtn_right_get(a_type, a_field, (a_node));		\
     rbtn_right_set(a_type, a_field, (a_node),				\
       rbtn_left_get(a_type, a_field, (r_node)));			\
     rbtn_left_set(a_type, a_field, (r_node), (a_node));			\
 } while (0)
 
-#define	rbtn_rotate_right(a_type, a_field, a_node, r_node) do {		\
+#define rbtn_rotate_right(a_type, a_field, a_node, r_node) do {		\
     (r_node) = rbtn_left_get(a_type, a_field, (a_node));		\
     rbtn_left_set(a_type, a_field, (a_node),				\
       rbtn_right_get(a_type, a_field, (r_node)));			\
@@ -155,7 +155,7 @@ struct {								\
  * functions generated by an equivalently parameterized call to rb_gen().
  */
 
-#define	rb_proto(a_attr, a_prefix, a_rbt_type, a_type)			\
+#define rb_proto(a_attr, a_prefix, a_rbt_type, a_type)			\
 a_attr void								\
 a_prefix##new(a_rbt_type *rbtree);					\
 a_attr a_type *								\
@@ -304,7 +304,7 @@ a_prefix##reverse_iter(a_rbt_type *rbtree, a_type *start,		\
  *       Ret: NULL if iteration completed, or the non-NULL callback return value
  *            that caused termination of the iteration.
  */
-#define	rb_gen(a_attr, a_prefix, a_rbt_type, a_type, a_field, a_cmp)	\
+#define rb_gen(a_attr, a_prefix, a_rbt_type, a_type, a_field, a_cmp)	\
 a_attr void								\
 a_prefix##new(a_rbt_type *rbtree) {					\
     rb_new(a_type, a_field, rbtree);					\

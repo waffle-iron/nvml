@@ -1,13 +1,13 @@
-#define	JEMALLOC_QUARANTINE_C_
+#define JEMALLOC_QUARANTINE_C_
 #include "jemalloc/internal/jemalloc_internal.h"
 
 /*
  * quarantine pointers close to NULL are used to encode state information that
  * is used for cleaning up during thread shutdown.
  */
-#define	QUARANTINE_STATE_REINCARNATED	((quarantine_t *)(uintptr_t)1)
-#define	QUARANTINE_STATE_PURGATORY	((quarantine_t *)(uintptr_t)2)
-#define	QUARANTINE_STATE_MAX		QUARANTINE_STATE_PURGATORY
+#define QUARANTINE_STATE_REINCARNATED	((quarantine_t *)(uintptr_t)1)
+#define QUARANTINE_STATE_PURGATORY	((quarantine_t *)(uintptr_t)2)
+#define QUARANTINE_STATE_MAX		QUARANTINE_STATE_PURGATORY
 
 /******************************************************************************/
 /* Data. */

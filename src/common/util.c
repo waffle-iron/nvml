@@ -55,18 +55,18 @@
 #include "out.h"
 #include "valgrind_internal.h"
 
-#define	PROCMAXLEN 2048 /* maximum expected line length in /proc files */
+#define PROCMAXLEN 2048 /* maximum expected line length in /proc files */
 
-#define	MEGABYTE ((uintptr_t)1 << 20)
-#define	GIGABYTE ((uintptr_t)1 << 30)
+#define MEGABYTE ((uintptr_t)1 << 20)
+#define GIGABYTE ((uintptr_t)1 << 30)
 
 /*
  * set of macros for determining the alignment descriptor
  */
-#define	DESC_MASK		((1 << ALIGNMENT_DESC_BITS) - 1)
-#define	alignment_of(t)		offsetof(struct { char c; t x; }, x)
-#define	alignment_desc_of(t)	(((uint64_t)alignment_of(t) - 1) & DESC_MASK)
-#define	alignment_desc()\
+#define DESC_MASK		((1 << ALIGNMENT_DESC_BITS) - 1)
+#define alignment_of(t)		offsetof(struct { char c; t x; }, x)
+#define alignment_desc_of(t)	(((uint64_t)alignment_of(t) - 1) & DESC_MASK)
+#define alignment_desc()\
 (alignment_desc_of(char)	<<  0 * ALIGNMENT_DESC_BITS) |\
 (alignment_desc_of(short)	<<  1 * ALIGNMENT_DESC_BITS) |\
 (alignment_desc_of(int)		<<  2 * ALIGNMENT_DESC_BITS) |\
@@ -365,7 +365,7 @@ util_tmpfile(const char *dir, const char *templ)
 
 	int oerrno;
 
-	char *fullname = alloca(strlen(dir) + sizeof (templ));
+	char *fullname = alloca(strlen(dir) + sizeof(templ));
 	(void) strcpy(fullname, dir);
 	(void) strcat(fullname, templ);
 
@@ -513,7 +513,7 @@ util_convert_hdr(struct pool_hdr *hdrp)
 	hdrp->checksum = le64toh(hdrp->checksum);
 
 	/* and to be valid, the fields must checksum correctly */
-	if (!util_checksum(hdrp, sizeof (*hdrp), &hdrp->checksum, 0)) {
+	if (!util_checksum(hdrp, sizeof(*hdrp), &hdrp->checksum, 0)) {
 		ERR("invalid checksum of pool header");
 		return 0;
 	}
@@ -533,7 +533,7 @@ util_get_arch_flags(struct arch_flags *arch_flags)
 	ElfW(Ehdr) elf;
 	int ret = 0;
 
-	memset(arch_flags, 0, sizeof (*arch_flags));
+	memset(arch_flags, 0, sizeof(*arch_flags));
 
 	if ((fd = open(path, O_RDONLY)) < 0) {
 		ERR("!open %s", path);
@@ -541,7 +541,7 @@ util_get_arch_flags(struct arch_flags *arch_flags)
 		goto out;
 	}
 
-	if (read(fd, &elf, sizeof (elf)) != sizeof (elf)) {
+	if (read(fd, &elf, sizeof(elf)) != sizeof(elf)) {
 		ERR("!read %s", path);
 		ret = -1;
 		goto out_close;
@@ -581,7 +581,7 @@ util_check_arch_flags(const struct arch_flags *arch_flags)
 	int ret = 0;
 
 	if (!util_is_zeroed(&arch_flags->reserved,
-				sizeof (arch_flags->reserved))) {
+				sizeof(arch_flags->reserved))) {
 		ERR("invalid reserved values");
 		ret = -1;
 	}
@@ -720,7 +720,7 @@ util_feature_check(struct pool_hdr *hdrp, uint32_t incompat,
 	LOG(3, "hdrp %p incompat %#x ro_compat %#x compat %#x",
 			hdrp, incompat, ro_compat, compat);
 
-#define	GET_NOT_MASKED_BITS(x, mask) ((x) & ~(mask))
+#define GET_NOT_MASKED_BITS(x, mask) ((x) & ~(mask))
 
 	uint32_t ubits;	/* unsupported bits */
 

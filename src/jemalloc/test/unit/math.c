@@ -1,12 +1,12 @@
 #include "test/jemalloc_test.h"
 
-#define	MAX_REL_ERR 1.0e-9
-#define	MAX_ABS_ERR 1.0e-9
+#define MAX_REL_ERR 1.0e-9
+#define MAX_ABS_ERR 1.0e-9
 
 #include <float.h>
 
 #ifndef INFINITY
-#define	INFINITY (DBL_MAX + DBL_MAX)
+#define INFINITY (DBL_MAX + DBL_MAX)
 #endif
 
 static bool

@@ -185,7 +185,7 @@ TEST_BEGIN(test_pool_reuse_pool) {
 
 		/* allocate memory from pool */
 		for (; i<100; ++i) {
-			void **next = pool_malloc(pool, sizeof (void *));
+			void **next = pool_malloc(pool, sizeof(void *));
 
 			assert_lu_gt((uintptr_t)next, (uintptr_t)mem_pool,
 				"pool_malloc() should return pointer to memory from pool");
@@ -276,12 +276,12 @@ TEST_BEGIN(test_pool_use_all_memory) {
 
 	void *prev = NULL;
 	for (;;) {
-		void **next = pool_malloc(pool, sizeof (void *));
+		void **next = pool_malloc(pool, sizeof(void *));
 		if (next == NULL) {
 			/* Out of memory in pool, test end */
 			break;
 		}
-		size += sizeof (void *);
+		size += sizeof(void *);
 
 		assert_ptr_not_null(next, "pool_malloc should return valid ptr");
 
@@ -354,7 +354,7 @@ TEST_BEGIN(test_pool_extend_after_out_of_memory) {
 	pool = pool_create(mem_pool, TEST_POOL_SIZE, 1);
 
 	/* use the all memory from pool and from base allocator */
-	while (pool_malloc(pool, sizeof (void *)));
+	while (pool_malloc(pool, sizeof(void *)));
 	pool->base_next_addr = pool->base_past_addr;
 
 	memset(mem_extend_ok, 0, TEST_POOL_SIZE);
@@ -457,7 +457,7 @@ TEST_BEGIN(test_pool_check_memory_overlap) {
 TEST_END
 
 
-#define	POOL_TEST_CASES\
+#define POOL_TEST_CASES\
 	test_pool_create_errors,	\
 	test_pool_create,	\
 	test_pool_malloc,	\

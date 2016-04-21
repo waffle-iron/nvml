@@ -133,7 +133,7 @@ TEST_END
 TEST_BEGIN(test_mallctl_config)
 {
 
-#define	TEST_MALLCTL_CONFIG(config) do {				\
+#define TEST_MALLCTL_CONFIG(config) do {				\
 	bool oldval;							\
 	size_t sz = sizeof(oldval);					\
 	assert_d_eq(mallctl("config."#config, &oldval, &sz, NULL, 0),	\
@@ -164,7 +164,7 @@ TEST_BEGIN(test_mallctl_opt)
 {
 	bool config_always = true;
 
-#define	TEST_MALLCTL_OPT(t, opt, config) do {				\
+#define TEST_MALLCTL_OPT(t, opt, config) do {				\
 	t oldval;							\
 	size_t sz = sizeof(oldval);					\
 	int expected = config_##config ? 0 : ENOENT;			\
@@ -379,7 +379,7 @@ TEST_END
 TEST_BEGIN(test_arenas_constants)
 {
 
-#define	TEST_ARENAS_CONSTANT(t, name, expected) do {			\
+#define TEST_ARENAS_CONSTANT(t, name, expected) do {			\
 	t name;								\
 	size_t sz = sizeof(t);						\
 	assert_d_eq(mallctl("pool.0.arenas."#name, &name, &sz, NULL, 0), 0,	\
@@ -399,7 +399,7 @@ TEST_END
 TEST_BEGIN(test_arenas_bin_constants)
 {
 
-#define	TEST_ARENAS_BIN_CONSTANT(t, name, expected) do {		\
+#define TEST_ARENAS_BIN_CONSTANT(t, name, expected) do {		\
 	t name;								\
 	size_t sz = sizeof(t);						\
 	assert_d_eq(mallctl("pool.0.arenas.bin.0."#name, &name, &sz, NULL, 0),	\
@@ -417,7 +417,7 @@ TEST_END
 TEST_BEGIN(test_arenas_lrun_constants)
 {
 
-#define	TEST_ARENAS_LRUN_CONSTANT(t, name, expected) do {		\
+#define TEST_ARENAS_LRUN_CONSTANT(t, name, expected) do {		\
 	t name;								\
 	size_t sz = sizeof(t);						\
 	assert_d_eq(mallctl("pool.0.arenas.lrun.0."#name, &name, &sz, NULL,	\
@@ -491,7 +491,7 @@ TEST_END
 TEST_BEGIN(test_stats_arenas)
 {
 
-#define	TEST_STATS_ARENAS(t, name) do {					\
+#define TEST_STATS_ARENAS(t, name) do {					\
 	t name;								\
 	size_t sz = sizeof(t);						\
 	assert_d_eq(mallctl("pool.0.stats.arenas.0."#name, &name, &sz, NULL,	\

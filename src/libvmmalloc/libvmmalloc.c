@@ -56,7 +56,7 @@
  *    process, even if the configured log file name is terminated with "-".
  */
 
-#define	_GNU_SOURCE
+#define _GNU_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -81,7 +81,7 @@
 #include "out.h"
 #include "valgrind_internal.h"
 
-#define	HUGE (2 * 1024 * 1024)
+#define HUGE (2 * 1024 * 1024)
 
 /*
  * private to this file...
@@ -305,7 +305,7 @@ malloc_usable_size(void *ptr)
 #if (defined(__GLIBC__) && !defined(__UCLIBC__))
 
 #ifndef __MALLOC_HOOK_VOLATILE
-#define	__MALLOC_HOOK_VOLATILE
+#define __MALLOC_HOOK_VOLATILE
 #endif
 
 /*
@@ -379,7 +379,7 @@ libvmmalloc_create(const char *dir, size_t size)
 
 	/* store opaque info at beginning of mapped area */
 	struct vmem *vmp = addr;
-	memset(&vmp->hdr, '\0', sizeof (vmp->hdr));
+	memset(&vmp->hdr, '\0', sizeof(vmp->hdr));
 	memcpy(vmp->hdr.signature, VMEM_HDR_SIG, POOL_HDR_SIG_LEN);
 	vmp->addr = addr;
 	vmp->size = size;
@@ -399,7 +399,7 @@ libvmmalloc_create(const char *dir, size_t size)
 	 * The prototype PMFS doesn't allow this when large pages are in
 	 * use. It is not considered an error if this fails.
 	 */
-	util_range_none(addr, sizeof (struct pool_hdr));
+	util_range_none(addr, sizeof(struct pool_hdr));
 
 	LOG(3, "vmp %p", vmp);
 	return vmp;
@@ -434,7 +434,7 @@ libvmmalloc_clone(void)
 	LOG(3, "copy the entire pool file: dst %p src %p size %zu",
 			addr, Vmp->addr, Vmp->size);
 
-	util_range_rw(Vmp->addr, sizeof (struct pool_hdr));
+	util_range_rw(Vmp->addr, sizeof(struct pool_hdr));
 
 	/*
 	 * Part of vmem pool was probably freed at some point, so Valgrind
@@ -445,7 +445,7 @@ libvmmalloc_clone(void)
 	memcpy(addr, Vmp->addr, Vmp->size);
 	VALGRIND_DO_ENABLE_ERROR_REPORTING;
 
-	util_range_none(Vmp->addr, sizeof (struct pool_hdr));
+	util_range_none(Vmp->addr, sizeof(struct pool_hdr));
 
 	return addr;
 }
@@ -625,7 +625,7 @@ libvmmalloc_init(void)
 	/* set up jemalloc messages to a custom print function */
 	je_vmem_malloc_message = print_jemalloc_messages;
 
-	Header_size = roundup(sizeof (VMEM), Pagesize);
+	Header_size = roundup(sizeof(VMEM), Pagesize);
 
 	if ((Dir = getenv(VMMALLOC_POOL_DIR_VAR)) == NULL) {
 		out_log(NULL, 0, NULL, 0, "Error (libvmmalloc): "

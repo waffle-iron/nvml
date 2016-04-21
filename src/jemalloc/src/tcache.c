@@ -1,4 +1,4 @@
-#define	JEMALLOC_TCACHE_C_
+#define JEMALLOC_TCACHE_C_
 #include "jemalloc/internal/jemalloc_internal.h"
 
 /******************************************************************************/
@@ -426,23 +426,23 @@ tcache_tsd_extend(tsd_tcache_t *tsd, unsigned len)
 	if (npools < POOLS_MIN)
 		npools = POOLS_MIN;
 
-	unsigned *tseqno = je_base_malloc(npools * sizeof (unsigned));
+	unsigned *tseqno = je_base_malloc(npools * sizeof(unsigned));
 	if (tseqno == NULL)
 		return (true);
 
 	if (tsd->seqno != NULL)
-		memcpy(tseqno, tsd->seqno, tsd->npools * sizeof (unsigned));
-	memset(&tseqno[tsd->npools], 0, (npools - tsd->npools) * sizeof (unsigned));
+		memcpy(tseqno, tsd->seqno, tsd->npools * sizeof(unsigned));
+	memset(&tseqno[tsd->npools], 0, (npools - tsd->npools) * sizeof(unsigned));
 
-	tcache_t **tcaches = je_base_malloc(npools * sizeof (tcache_t *));
+	tcache_t **tcaches = je_base_malloc(npools * sizeof(tcache_t *));
 	if (tcaches == NULL) {
 		je_base_free(tseqno);
 		return (true);
 	}
 
 	if (tsd->tcaches != NULL)
-		memcpy(tcaches, tsd->tcaches, tsd->npools * sizeof (tcache_t *));
-	memset(&tcaches[tsd->npools], 0, (npools - tsd->npools) * sizeof (tcache_t *));
+		memcpy(tcaches, tsd->tcaches, tsd->npools * sizeof(tcache_t *));
+	memset(&tcaches[tsd->npools], 0, (npools - tsd->npools) * sizeof(tcache_t *));
 
 	je_base_free(tsd->seqno);
 	tsd->seqno = tseqno;

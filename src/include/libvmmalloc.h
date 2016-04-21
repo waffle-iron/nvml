@@ -39,82 +39,82 @@
  */
 
 #ifndef	LIBVMMALLOC_H
-#define	LIBVMMALLOC_H 1
+#define LIBVMMALLOC_H 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define	VMMALLOC_MAJOR_VERSION 1
-#define	VMMALLOC_MINOR_VERSION 0
+#define VMMALLOC_MAJOR_VERSION 1
+#define VMMALLOC_MINOR_VERSION 0
 
 #include <sys/types.h>
 
-#define	VMMALLOC_MIN_POOL ((size_t)(1024 * 1024 * 14)) /* min pool size: 14MB */
+#define VMMALLOC_MIN_POOL ((size_t)(1024 * 1024 * 14)) /* min pool size: 14MB */
 
-#define	VMMALLOC_OVERRIDE_ALIGNED_ALLOC
-#define	VMMALLOC_OVERRIDE_VALLOC
-#define	VMMALLOC_OVERRIDE_MEMALIGN
+#define VMMALLOC_OVERRIDE_ALIGNED_ALLOC
+#define VMMALLOC_OVERRIDE_VALLOC
+#define VMMALLOC_OVERRIDE_MEMALIGN
 
 /*
  * check compiler support for various function attributes
  */
 #if defined(__GNUC__) && !defined(__clang__)
 
-#define	GCC_VER (__GNUC__ * 100 + __GNUC_MINOR__)
+#define GCC_VER (__GNUC__ * 100 + __GNUC_MINOR__)
 
 #if GCC_VER >= 296
-#define	__ATTR_MALLOC__ __attribute__((malloc))
+#define __ATTR_MALLOC__ __attribute__((malloc))
 #else
-#define	__ATTR_MALLOC__
+#define __ATTR_MALLOC__
 #endif
 
 #if GCC_VER >= 303
-#define	__ATTR_NONNULL__(x) __attribute__((nonnull(x)))
+#define __ATTR_NONNULL__(x) __attribute__((nonnull(x)))
 #else
-#define	__ATTR_NONNULL__(x)
+#define __ATTR_NONNULL__(x)
 #endif
 
 #if GCC_VER >= 403
-#define	__ATTR_ALLOC_SIZE__(...) __attribute__((alloc_size(__VA_ARGS__)))
+#define __ATTR_ALLOC_SIZE__(...) __attribute__((alloc_size(__VA_ARGS__)))
 #else
-#define	__ATTR_ALLOC_SIZE__(...)
+#define __ATTR_ALLOC_SIZE__(...)
 #endif
 
 #if GCC_VER >= 409
-#define	__ATTR_ALLOC_ALIGN__(x) __attribute__((alloc_align(x)))
+#define __ATTR_ALLOC_ALIGN__(x) __attribute__((alloc_align(x)))
 #else
-#define	__ATTR_ALLOC_ALIGN__(x)
+#define __ATTR_ALLOC_ALIGN__(x)
 #endif
 
 #else /* clang and other compilers */
 
 #ifndef __has_attribute
-#define	__has_attribute(x) 0
+#define __has_attribute(x) 0
 #endif
 
 #if __has_attribute(malloc)
-#define	__ATTR_MALLOC__ __attribute__((malloc))
+#define __ATTR_MALLOC__ __attribute__((malloc))
 #else
-#define	__ATTR_MALLOC__
+#define __ATTR_MALLOC__
 #endif
 
 #if __has_attribute(nonnull)
-#define	__ATTR_NONNULL__(x) __attribute__((nonnull(x)))
+#define __ATTR_NONNULL__(x) __attribute__((nonnull(x)))
 #else
-#define	__ATTR_NONNULL__(x)
+#define __ATTR_NONNULL__(x)
 #endif
 
 #if __has_attribute(alloc_size)
-#define	__ATTR_ALLOC_SIZE__(...) __attribute__((alloc_size(__VA_ARGS__)))
+#define __ATTR_ALLOC_SIZE__(...) __attribute__((alloc_size(__VA_ARGS__)))
 #else
-#define	__ATTR_ALLOC_SIZE__(...)
+#define __ATTR_ALLOC_SIZE__(...)
 #endif
 
 #if __has_attribute(alloc_align)
-#define	__ATTR_ALLOC_ALIGN__(x) __attribute__((alloc_align(x)))
+#define __ATTR_ALLOC_ALIGN__(x) __attribute__((alloc_align(x)))
 #else
-#define	__ATTR_ALLOC_ALIGN__(x)
+#define __ATTR_ALLOC_ALIGN__(x)
 #endif
 
 #endif /* __GNUC__ */

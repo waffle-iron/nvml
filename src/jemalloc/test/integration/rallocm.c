@@ -61,11 +61,11 @@ TEST_BEGIN(test_grow_and_shrink)
 {
 	void *p, *q;
 	size_t tsz;
-#define	NCYCLES 3
+#define NCYCLES 3
 	unsigned i, j;
-#define	NSZS 2500
+#define NSZS 2500
 	size_t szs[NSZS];
-#define	MAXSZ ZU(12 * 1024 * 1024)
+#define MAXSZ ZU(12 * 1024 * 1024)
 
 	assert_d_eq(allocm(&p, &szs[0], 1, 0), ALLOCM_SUCCESS,
 	    "Unexpected allocm() error");

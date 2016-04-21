@@ -35,7 +35,7 @@
  */
 
 #ifndef	_GNU_SOURCE
-#define	_GNU_SOURCE
+#define _GNU_SOURCE
 #endif
 
 #include "unittest.h"
@@ -46,11 +46,11 @@
 
 #ifdef	USE_LIBUNWIND
 
-#define	UNW_LOCAL_ONLY
+#define UNW_LOCAL_ONLY
 #include <libunwind.h>
 #include <dlfcn.h>
 
-#define	PROCNAMELEN 256
+#define PROCNAMELEN 256
 /*
  * ut_dump_backtrace -- dump stacktrace to error log using libunwind
  */
@@ -118,7 +118,7 @@ ut_dump_backtrace(void)
 
 #include <execinfo.h>
 
-#define	SIZE 100
+#define SIZE 100
 
 /*
  * ut_dump_backtrace -- dump stacktrace to error log using libc's backtrace

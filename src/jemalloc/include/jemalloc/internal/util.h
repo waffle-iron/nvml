@@ -2,19 +2,19 @@
 #ifdef JEMALLOC_H_TYPES
 
 /* Size of stack-allocated buffer passed to buferror(). */
-#define	BUFERROR_BUF		64
+#define BUFERROR_BUF		64
 
 /*
  * Size of stack-allocated buffer used by malloc_{,v,vc}printf().  This must be
  * large enough for all possible uses within jemalloc.
  */
-#define	MALLOC_PRINTF_BUFSIZE	4096
+#define MALLOC_PRINTF_BUFSIZE	4096
 
 /*
  * Wrap a cpp argument that contains commas such that it isn't broken up into
  * multiple arguments.
  */
-#define	JEMALLOC_ARG_CONCAT(...) __VA_ARGS__
+#define JEMALLOC_ARG_CONCAT(...) __VA_ARGS__
 
 /*
  * Silence compiler warnings due to uninitialized values.  This is used
@@ -40,7 +40,7 @@
  * assertion failure.
  */
 #ifndef assert
-#define	assert(e) do {							\
+#define assert(e) do {							\
 	if (config_debug && !(e)) {					\
 		malloc_printf(						\
 		    "<jemalloc>: %s:%d: Failed assertion: \"%s\"\n",	\
@@ -51,7 +51,7 @@
 #endif
 
 #ifndef not_reached
-#define	not_reached() do {						\
+#define not_reached() do {						\
 	if (config_debug) {						\
 		malloc_printf(						\
 		    "<jemalloc>: %s:%d: Unreachable code reached\n",	\
@@ -62,7 +62,7 @@
 #endif
 
 #ifndef not_implemented
-#define	not_implemented() do {						\
+#define not_implemented() do {						\
 	if (config_debug) {						\
 		malloc_printf("<jemalloc>: %s:%d: Not implemented\n",	\
 		    __FILE__, __LINE__);				\
@@ -72,14 +72,14 @@
 #endif
 
 #ifndef assert_not_implemented
-#define	assert_not_implemented(e) do {					\
+#define assert_not_implemented(e) do {					\
 	if (config_debug && !(e))					\
 		not_implemented();					\
 } while (0)
 #endif
 
 /* Use to assert a particular configuration, e.g., cassert(config_debug). */
-#define	cassert(c) do {							\
+#define cassert(c) do {							\
 	if ((c) == false)						\
 		not_reached();						\
 } while (0)

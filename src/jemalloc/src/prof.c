@@ -1,9 +1,9 @@
-#define	JEMALLOC_PROF_C_
+#define JEMALLOC_PROF_C_
 #include "jemalloc/internal/jemalloc_internal.h"
 /******************************************************************************/
 
 #ifdef JEMALLOC_PROF_LIBUNWIND
-#define	UNW_LOCAL_ONLY
+#define UNW_LOCAL_ONLY
 #include <libunwind.h>
 #endif
 
@@ -213,7 +213,7 @@ prof_backtrace(prof_bt_t *bt)
 void
 prof_backtrace(prof_bt_t *bt)
 {
-#define	BT_FRAME(i)							\
+#define BT_FRAME(i)							\
 	if ((i) < PROF_BT_MAX) {					\
 		void *p;						\
 		if (__builtin_frame_address(i) == 0)			\
@@ -698,7 +698,7 @@ prof_bt_count(void)
 
 #ifdef JEMALLOC_JET
 #undef prof_dump_open
-#define	prof_dump_open JEMALLOC_N(prof_dump_open_impl)
+#define prof_dump_open JEMALLOC_N(prof_dump_open_impl)
 #endif
 static int
 prof_dump_open(bool propagate_err, const char *filename)
@@ -717,7 +717,7 @@ prof_dump_open(bool propagate_err, const char *filename)
 }
 #ifdef JEMALLOC_JET
 #undef prof_dump_open
-#define	prof_dump_open JEMALLOC_N(prof_dump_open)
+#define prof_dump_open JEMALLOC_N(prof_dump_open)
 prof_dump_open_t *prof_dump_open = JEMALLOC_N(prof_dump_open_impl);
 #endif
 
@@ -1090,8 +1090,8 @@ label_open_close_error:
 	return (true);
 }
 
-#define	DUMP_FILENAME_BUFSIZE	(PATH_MAX + 1)
-#define	VSEQ_INVALID		UINT64_C(0xffffffffffffffff)
+#define DUMP_FILENAME_BUFSIZE	(PATH_MAX + 1)
+#define VSEQ_INVALID		UINT64_C(0xffffffffffffffff)
 static void
 prof_dump_filename(char *filename, char v, uint64_t vseq)
 {

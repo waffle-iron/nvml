@@ -1,4 +1,4 @@
-#define	JEMALLOC_HUGE_C_
+#define JEMALLOC_HUGE_C_
 #include "jemalloc/internal/jemalloc_internal.h"
 
 void *
@@ -67,7 +67,7 @@ huge_palloc(arena_t *arena, size_t size, size_t alignment, bool zero)
 
 #ifdef JEMALLOC_JET
 #undef huge_dalloc_junk
-#define	huge_dalloc_junk JEMALLOC_N(huge_dalloc_junk_impl)
+#define huge_dalloc_junk JEMALLOC_N(huge_dalloc_junk_impl)
 #endif
 static void
 huge_dalloc_junk(void *ptr, size_t usize)
@@ -84,7 +84,7 @@ huge_dalloc_junk(void *ptr, size_t usize)
 }
 #ifdef JEMALLOC_JET
 #undef huge_dalloc_junk
-#define	huge_dalloc_junk JEMALLOC_N(huge_dalloc_junk)
+#define huge_dalloc_junk JEMALLOC_N(huge_dalloc_junk)
 huge_dalloc_junk_t *huge_dalloc_junk = JEMALLOC_N(huge_dalloc_junk_impl);
 #endif
 

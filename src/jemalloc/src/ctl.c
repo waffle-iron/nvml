@@ -1,4 +1,4 @@
-#define	JEMALLOC_CTL_C_
+#define JEMALLOC_CTL_C_
 #include "jemalloc/internal/jemalloc_internal.h"
 #include "jemalloc/internal/pool.h"
 
@@ -42,11 +42,11 @@ ctl_indexed_node(const ctl_node_t *node)
 /******************************************************************************/
 /* Function prototypes for non-inline static functions. */
 
-#define	CTL_PROTO(n)							\
+#define CTL_PROTO(n)							\
 static int	n##_ctl(const size_t *mib, size_t miblen, void *oldp,	\
     size_t *oldlenp, void *newp, size_t newlen);
 
-#define	INDEX_PROTO(n)							\
+#define INDEX_PROTO(n)							\
 static const ctl_named_node_t	*n##_index(const size_t *mib,		\
     size_t miblen, size_t i);
 
@@ -187,20 +187,20 @@ CTL_PROTO(pool_i_size)
 /* mallctl tree. */
 
 /* Maximum tree depth. */
-#define	CTL_MAX_DEPTH	8
+#define CTL_MAX_DEPTH	8
 
-#define	NAME(n)	{true},	n
-#define	CHILD(t, c)							\
+#define NAME(n)	{true},	n
+#define CHILD(t, c)							\
 	sizeof(c##_node) / sizeof(ctl_##t##_node_t),			\
 	(ctl_node_t *)c##_node,						\
 	NULL
-#define	CTL(c)	0, NULL, c##_ctl
+#define CTL(c)	0, NULL, c##_ctl
 
 /*
  * Only handles internal indexed nodes, since there are currently no external
  * ones.
  */
-#define	INDEX(i)	{false},	i##_index
+#define INDEX(i)	{false},	i##_index
 
 static const ctl_named_node_t	tcache_node[] = {
 	{NAME("enabled"),	CTL(thread_tcache_enabled)},
@@ -1013,21 +1013,21 @@ ctl_postfork_child(void)
 /******************************************************************************/
 /* *_ctl() functions. */
 
-#define	READONLY()	do {						\
+#define READONLY()	do {						\
 	if (newp != NULL || newlen != 0) {				\
 		ret = EPERM;						\
 		goto label_return;					\
 	}								\
 } while (0)
 
-#define	WRITEONLY()	do {						\
+#define WRITEONLY()	do {						\
 	if (oldp != NULL || oldlenp != NULL) {				\
 		ret = EPERM;						\
 		goto label_return;					\
 	}								\
 } while (0)
 
-#define	READ(v, t)	do {						\
+#define READ(v, t)	do {						\
 	if (oldp != NULL && oldlenp != NULL) {				\
 		if (*oldlenp != sizeof(t)) {				\
 			size_t	copylen = (sizeof(t) <= *oldlenp)	\
@@ -1040,7 +1040,7 @@ ctl_postfork_child(void)
 	}								\
 } while (0)
 
-#define	WRITE(v, t)	do {						\
+#define WRITE(v, t)	do {						\
 	if (newp != NULL) {						\
 		if (newlen != sizeof(t)) {				\
 			ret = EINVAL;					\
@@ -1054,7 +1054,7 @@ ctl_postfork_child(void)
  * There's a lot of code duplication in the following macros due to limitations
  * in how nested cpp macros are expanded.
  */
-#define	CTL_RO_CLGEN(c, l, n, v, t)					\
+#define CTL_RO_CLGEN(c, l, n, v, t)					\
 static int								\
 n##_ctl(const size_t *mib, size_t miblen, void *oldp, size_t *oldlenp,	\
     void *newp, size_t newlen)						\
@@ -1077,7 +1077,7 @@ label_return:								\
 	return (ret);							\
 }
 
-#define	CTL_RO_CGEN(c, n, v, t)						\
+#define CTL_RO_CGEN(c, n, v, t)						\
 static int								\
 n##_ctl(const size_t *mib, size_t miblen, void *oldp, size_t *oldlenp,	\
     void *newp, size_t newlen)						\
@@ -1098,7 +1098,7 @@ label_return:								\
 	return (ret);							\
 }
 
-#define	CTL_RO_GEN(n, v, t)						\
+#define CTL_RO_GEN(n, v, t)						\
 static int								\
 n##_ctl(const size_t *mib, size_t miblen, void *oldp, size_t *oldlenp,	\
     void *newp, size_t newlen)						\
@@ -1121,7 +1121,7 @@ label_return:								\
  * ctl_mtx is not acquired, under the assumption that no pertinent data will
  * mutate during the call.
  */
-#define	CTL_RO_NL_CGEN(c, n, v, t)					\
+#define CTL_RO_NL_CGEN(c, n, v, t)					\
 static int								\
 n##_ctl(const size_t *mib, size_t miblen, void *oldp, size_t *oldlenp,	\
     void *newp, size_t newlen)						\
@@ -1140,7 +1140,7 @@ label_return:								\
 	return (ret);							\
 }
 
-#define	CTL_RO_NL_GEN(n, v, t)						\
+#define CTL_RO_NL_GEN(n, v, t)						\
 static int								\
 n##_ctl(const size_t *mib, size_t miblen, void *oldp, size_t *oldlenp,	\
     void *newp, size_t newlen)						\
@@ -1157,7 +1157,7 @@ label_return:								\
 	return (ret);							\
 }
 
-#define	CTL_RO_BOOL_CONFIG_GEN(n)					\
+#define CTL_RO_BOOL_CONFIG_GEN(n)					\
 static int								\
 n##_ctl(const size_t *mib, size_t miblen, void *oldp, size_t *oldlenp,	\
     void *newp, size_t newlen)						\
@@ -1265,23 +1265,23 @@ thread_arena_ctl(const size_t *mib, size_t miblen, void *oldp, size_t *oldlenp,
 		if (npools < POOLS_MIN)
 			npools = POOLS_MIN;
 
-		unsigned *tseqno = je_base_malloc(npools * sizeof (unsigned));
+		unsigned *tseqno = je_base_malloc(npools * sizeof(unsigned));
 		if (tseqno == NULL)
 			return (ENOMEM);
 
 		if (tcache_tsd->seqno != NULL)
-			memcpy(tseqno, tcache_tsd->seqno, tcache_tsd->npools * sizeof (unsigned));
-		memset(&tseqno[tcache_tsd->npools], 0, (npools - tcache_tsd->npools) * sizeof (unsigned));
+			memcpy(tseqno, tcache_tsd->seqno, tcache_tsd->npools * sizeof(unsigned));
+		memset(&tseqno[tcache_tsd->npools], 0, (npools - tcache_tsd->npools) * sizeof(unsigned));
 
-		tcache_t **tcaches = je_base_malloc(npools * sizeof (tcache_t *));
+		tcache_t **tcaches = je_base_malloc(npools * sizeof(tcache_t *));
 		if (tcaches == NULL) {
 			je_base_free(tseqno);
 			return (ENOMEM);
 		}
 
 		if (tcache_tsd->tcaches != NULL)
-			memcpy(tcaches, tcache_tsd->tcaches, tcache_tsd->npools * sizeof (tcache_t *));
-		memset(&tcaches[tcache_tsd->npools], 0, (npools - tcache_tsd->npools) * sizeof (tcache_t *));
+			memcpy(tcaches, tcache_tsd->tcaches, tcache_tsd->npools * sizeof(tcache_t *));
+		memset(&tcaches[tcache_tsd->npools], 0, (npools - tcache_tsd->npools) * sizeof(tcache_t *));
 
 		je_base_free(tcache_tsd->seqno);
 		tcache_tsd->seqno = tseqno;

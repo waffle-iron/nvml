@@ -52,8 +52,8 @@ TEST_BEGIN(test_malloc_strtoumax)
 		const char *expected_errno_name;
 		uintmax_t expected_x;
 	};
-#define	ERR(e)		e, #e
-#define	KUMAX(x)	((uintmax_t)x##ULL)
+#define ERR(e)		e, #e
+#define KUMAX(x)	((uintmax_t)x##ULL)
 	struct test_s tests[] = {
 		{"0",		"0",	-1,	ERR(EINVAL),	UINTMAX_MAX},
 		{"0",		"0",	1,	ERR(EINVAL),	UINTMAX_MAX},
@@ -137,7 +137,7 @@ TEST_END
 
 TEST_BEGIN(test_malloc_snprintf_truncated)
 {
-#define	BUFLEN	15
+#define BUFLEN	15
 	char buf[BUFLEN];
 	int result;
 	size_t len;
@@ -170,10 +170,10 @@ TEST_END
 
 TEST_BEGIN(test_malloc_snprintf)
 {
-#define	BUFLEN	128
+#define BUFLEN	128
 	char buf[BUFLEN];
 	int result;
-#define	TEST(expected_str, ...) do {					\
+#define TEST(expected_str, ...) do {					\
 	result = malloc_snprintf(buf, sizeof(buf), __VA_ARGS__);	\
 	assert_str_eq(buf, expected_str, "Unexpected output");		\
 	assert_d_eq(result, strlen(expected_str), "Unexpected result");	\

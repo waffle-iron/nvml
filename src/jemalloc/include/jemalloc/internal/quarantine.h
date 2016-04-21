@@ -5,7 +5,7 @@ typedef struct quarantine_obj_s quarantine_obj_t;
 typedef struct quarantine_s quarantine_t;
 
 /* Default per thread quarantine size if valgrind is enabled. */
-#define	JEMALLOC_VALGRIND_QUARANTINE_DEFAULT	(ZU(1) << 24)
+#define JEMALLOC_VALGRIND_QUARANTINE_DEFAULT	(ZU(1) << 24)
 
 #endif /* JEMALLOC_H_TYPES */
 /******************************************************************************/
@@ -20,7 +20,7 @@ struct quarantine_s {
 	size_t			curbytes;
 	size_t			curobjs;
 	size_t			first;
-#define	LG_MAXOBJS_INIT 10
+#define LG_MAXOBJS_INIT 10
 	size_t			lg_maxobjs;
 	quarantine_obj_t	objs[1]; /* Dynamically sized ring buffer. */
 };

@@ -30,7 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #ifndef	HASHMAP_TX_H
-#define	HASHMAP_TX_H
+#define HASHMAP_TX_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -38,7 +38,7 @@
 #include <libpmemobj.h>
 
 #ifndef	HASHMAP_TX_TYPE_OFFSET
-#define	HASHMAP_TX_TYPE_OFFSET 1004
+#define HASHMAP_TX_TYPE_OFFSET 1004
 #endif
 
 struct hashmap_tx;

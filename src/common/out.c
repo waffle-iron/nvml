@@ -57,7 +57,7 @@ static unsigned Log_alignment;
 
 #ifndef NO_LIBPTHREAD
 
-#define	MAXPRINT 8192	/* maximum expected log line */
+#define MAXPRINT 8192	/* maximum expected log line */
 
 static pthread_once_t Last_errormsg_key_once = PTHREAD_ONCE_INIT;
 static pthread_key_t Last_errormsg_key;
@@ -118,7 +118,7 @@ Last_errormsg_get()
  * not be longer than about 90 chars (in case of pmem_check_version()).
  */
 
-#define	MAXPRINT 256	/* maximum expected log line for libpmem */
+#define MAXPRINT 256	/* maximum expected log line for libpmem */
 
 static __thread char Last_errormsg[MAXPRINT];
 

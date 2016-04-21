@@ -30,7 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #ifndef	LIBTEST_H
-#define	LIBTEST_H
+#define LIBTEST_H
 
 #include <stddef.h>
 

@@ -2,7 +2,7 @@
 #ifdef JEMALLOC_H_TYPES
 
 /* Maximum number of malloc_tsd users with cleanup functions. */
-#define	MALLOC_TSD_CLEANUPS_MAX	8
+#define MALLOC_TSD_CLEANUPS_MAX	8
 
 typedef bool (*malloc_tsd_cleanup_t)(void);
 
@@ -61,7 +61,7 @@ typedef struct tsd_init_head_s tsd_init_head_t;
  */
 
 /* malloc_tsd_protos(). */
-#define	malloc_tsd_protos(a_attr, a_name, a_type)			\
+#define malloc_tsd_protos(a_attr, a_name, a_type)			\
 a_attr bool								\
 a_name##_tsd_boot(void);						\
 a_attr a_type *								\
@@ -71,21 +71,21 @@ a_name##_tsd_set(a_type *val);
 
 /* malloc_tsd_externs(). */
 #ifdef JEMALLOC_MALLOC_THREAD_CLEANUP
-#define	malloc_tsd_externs(a_name, a_type)				\
+#define malloc_tsd_externs(a_name, a_type)				\
 extern __thread a_type	a_name##_tls;					\
 extern __thread bool	a_name##_initialized;				\
 extern bool		a_name##_booted;
 #elif (defined(JEMALLOC_TLS))
-#define	malloc_tsd_externs(a_name, a_type)				\
+#define malloc_tsd_externs(a_name, a_type)				\
 extern __thread a_type	a_name##_tls;					\
 extern pthread_key_t	a_name##_tsd;					\
 extern bool		a_name##_booted;
 #elif (defined(_WIN32))
-#define	malloc_tsd_externs(a_name, a_type)				\
+#define malloc_tsd_externs(a_name, a_type)				\
 extern DWORD		a_name##_tsd;					\
 extern bool		a_name##_booted;
 #else
-#define	malloc_tsd_externs(a_name, a_type)				\
+#define malloc_tsd_externs(a_name, a_type)				\
 extern pthread_key_t	a_name##_tsd;					\
 extern tsd_init_head_t	a_name##_tsd_init_head;				\
 extern bool		a_name##_booted;
@@ -93,24 +93,24 @@ extern bool		a_name##_booted;
 
 /* malloc_tsd_data(). */
 #ifdef JEMALLOC_MALLOC_THREAD_CLEANUP
-#define	malloc_tsd_data(a_attr, a_name, a_type, a_initializer)		\
+#define malloc_tsd_data(a_attr, a_name, a_type, a_initializer)		\
 a_attr __thread a_type JEMALLOC_TLS_MODEL				\
     a_name##_tls = a_initializer;					\
 a_attr __thread bool JEMALLOC_TLS_MODEL					\
     a_name##_initialized = false;					\
 a_attr bool		a_name##_booted = false;
 #elif (defined(JEMALLOC_TLS))
-#define	malloc_tsd_data(a_attr, a_name, a_type, a_initializer)		\
+#define malloc_tsd_data(a_attr, a_name, a_type, a_initializer)		\
 a_attr __thread a_type JEMALLOC_TLS_MODEL				\
     a_name##_tls = a_initializer;					\
 a_attr pthread_key_t	a_name##_tsd;					\
 a_attr bool		a_name##_booted = false;
 #elif (defined(_WIN32))
-#define	malloc_tsd_data(a_attr, a_name, a_type, a_initializer)		\
+#define malloc_tsd_data(a_attr, a_name, a_type, a_initializer)		\
 a_attr DWORD		a_name##_tsd;					\
 a_attr bool		a_name##_booted = false;
 #else
-#define	malloc_tsd_data(a_attr, a_name, a_type, a_initializer)		\
+#define malloc_tsd_data(a_attr, a_name, a_type, a_initializer)		\
 a_attr pthread_key_t	a_name##_tsd;					\
 a_attr tsd_init_head_t	a_name##_tsd_init_head = {			\
 	ql_head_initializer(blocks),					\
@@ -121,7 +121,7 @@ a_attr bool		a_name##_booted = false;
 
 /* malloc_tsd_funcs(). */
 #ifdef JEMALLOC_MALLOC_THREAD_CLEANUP
-#define	malloc_tsd_funcs(a_attr, a_name, a_type, a_initializer,		\
+#define malloc_tsd_funcs(a_attr, a_name, a_type, a_initializer,		\
     a_cleanup)								\
 /* Initialization/cleanup. */						\
 a_attr bool								\
@@ -163,7 +163,7 @@ a_name##_tsd_set(a_type *val)						\
 		a_name##_initialized = true;				\
 }
 #elif (defined(JEMALLOC_TLS))
-#define	malloc_tsd_funcs(a_attr, a_name, a_type, a_initializer,		\
+#define malloc_tsd_funcs(a_attr, a_name, a_type, a_initializer,		\
     a_cleanup)								\
 /* Initialization/cleanup. */						\
 a_attr bool								\
@@ -202,7 +202,7 @@ a_name##_tsd_set(a_type *val)						\
 	}								\
 }
 #elif (defined(_WIN32))
-#define	malloc_tsd_funcs(a_attr, a_name, a_type, a_initializer,		\
+#define malloc_tsd_funcs(a_attr, a_name, a_type, a_initializer,		\
     a_cleanup)								\
 /* Data structure. */							\
 typedef struct {							\
@@ -295,7 +295,7 @@ a_name##_tsd_set(a_type *val)						\
 		wrapper->initialized = true;				\
 }
 #else
-#define	malloc_tsd_funcs(a_attr, a_name, a_type, a_initializer,		\
+#define malloc_tsd_funcs(a_attr, a_name, a_type, a_initializer,		\
     a_cleanup)								\
 /* Data structure. */							\
 typedef struct {							\
@@ -402,16 +402,16 @@ a_name##_tsd_set(a_type *val)						\
  */
 
 /* malloc_tsd_vector_protos(). */
-#define	malloc_tsd_vector_protos(a_attr, a_name)			\
+#define malloc_tsd_vector_protos(a_attr, a_name)			\
 malloc_tsd_protos(a_attr, a_name, vector_t)
 
-#define	malloc_tsd_vector_externs(a_name)				\
+#define malloc_tsd_vector_externs(a_name)				\
 malloc_tsd_externs(a_name, vector_t)
 
-#define	malloc_tsd_vector_data(a_attr, a_name)				\
+#define malloc_tsd_vector_data(a_attr, a_name)				\
 malloc_tsd_data(a_attr, a_name, vector_t, VECTOR_INITIALIZER)
 
-#define	malloc_tsd_vector_funcs(a_attr, a_name, a_type, a_cleanup)	\
+#define malloc_tsd_vector_funcs(a_attr, a_name, a_type, a_cleanup)	\
 malloc_tsd_funcs(a_attr, a_name, vector_t, VECTOR_INITIALIZER,		\
 	a_cleanup)							\
 									\

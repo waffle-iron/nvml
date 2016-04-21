@@ -46,7 +46,7 @@
 static const char *optstr = "Vhvfo:l:";
 
 /* non-printable value because this will be just a long option */
-#define	OPT_SYSLOG	0xFF00
+#define OPT_SYSLOG	0xFF00
 
 /*
  * long_options -- command line arguments

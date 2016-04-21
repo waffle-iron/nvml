@@ -45,7 +45,7 @@
  * ==========================================================================
  */
 #ifndef	_ARTTREE_H
-#define	_ARTTREE_H
+#define _ARTTREE_H
 
 #ifdef	__cplusplus
 extern "C" {

@@ -1,4 +1,4 @@
-#define	JEMALLOC_VECTOR_C_
+#define JEMALLOC_VECTOR_C_
 #include "jemalloc/internal/jemalloc_internal.h"
 
 /* Round up the value to the closest power of two. */

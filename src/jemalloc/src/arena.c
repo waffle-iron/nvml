@@ -1,4 +1,4 @@
-#define	JEMALLOC_ARENA_C_
+#define JEMALLOC_ARENA_C_
 #include "jemalloc/internal/jemalloc_internal.h"
 
 /******************************************************************************/
@@ -9,10 +9,10 @@ arena_bin_info_t	arena_bin_info[NBINS];
 
 JEMALLOC_ALIGNED(CACHELINE)
 const uint32_t	small_bin2size_tab[NBINS] = {
-#define	B2S_bin_yes(size) \
+#define B2S_bin_yes(size) \
 	size,
-#define	B2S_bin_no(size)
-#define	SC(index, lg_grp, lg_delta, ndelta, bin, lg_delta_lookup) \
+#define B2S_bin_no(size)
+#define SC(index, lg_grp, lg_delta, ndelta, bin, lg_delta_lookup) \
 	B2S_bin_##bin((ZU(1)<<lg_grp) + (ZU(ndelta)<<lg_delta))
 	SIZE_CLASSES
 #undef B2S_bin_yes
@@ -22,15 +22,15 @@ const uint32_t	small_bin2size_tab[NBINS] = {
 
 JEMALLOC_ALIGNED(CACHELINE)
 const uint8_t	small_size2bin_tab[] = {
-#define	S2B_3(i)	i,
-#define	S2B_4(i)	S2B_3(i) S2B_3(i)
-#define	S2B_5(i)	S2B_4(i) S2B_4(i)
-#define	S2B_6(i)	S2B_5(i) S2B_5(i)
-#define	S2B_7(i)	S2B_6(i) S2B_6(i)
-#define	S2B_8(i)	S2B_7(i) S2B_7(i)
-#define	S2B_9(i)	S2B_8(i) S2B_8(i)
-#define	S2B_no(i)
-#define	SC(index, lg_grp, lg_delta, ndelta, bin, lg_delta_lookup) \
+#define S2B_3(i)	i,
+#define S2B_4(i)	S2B_3(i) S2B_3(i)
+#define S2B_5(i)	S2B_4(i) S2B_4(i)
+#define S2B_6(i)	S2B_5(i) S2B_5(i)
+#define S2B_7(i)	S2B_6(i) S2B_6(i)
+#define S2B_8(i)	S2B_7(i) S2B_7(i)
+#define S2B_9(i)	S2B_8(i) S2B_8(i)
+#define S2B_no(i)
+#define SC(index, lg_grp, lg_delta, ndelta, bin, lg_delta_lookup) \
 	S2B_##lg_delta_lookup(index)
 	SIZE_CLASSES
 #undef S2B_3
@@ -1606,7 +1606,7 @@ arena_alloc_junk_small(void *ptr, arena_bin_info_t *bin_info, bool zero)
 
 #ifdef JEMALLOC_JET
 #undef arena_redzone_corruption
-#define	arena_redzone_corruption JEMALLOC_N(arena_redzone_corruption_impl)
+#define arena_redzone_corruption JEMALLOC_N(arena_redzone_corruption_impl)
 #endif
 static void
 arena_redzone_corruption(void *ptr, size_t usize, bool after,
@@ -1619,7 +1619,7 @@ arena_redzone_corruption(void *ptr, size_t usize, bool after,
 }
 #ifdef JEMALLOC_JET
 #undef arena_redzone_corruption
-#define	arena_redzone_corruption JEMALLOC_N(arena_redzone_corruption)
+#define arena_redzone_corruption JEMALLOC_N(arena_redzone_corruption)
 arena_redzone_corruption_t *arena_redzone_corruption =
     JEMALLOC_N(arena_redzone_corruption_impl);
 #endif
@@ -1656,7 +1656,7 @@ arena_redzones_validate(void *ptr, arena_bin_info_t *bin_info, bool reset)
 
 #ifdef JEMALLOC_JET
 #undef arena_dalloc_junk_small
-#define	arena_dalloc_junk_small JEMALLOC_N(arena_dalloc_junk_small_impl)
+#define arena_dalloc_junk_small JEMALLOC_N(arena_dalloc_junk_small_impl)
 #endif
 void
 arena_dalloc_junk_small(void *ptr, arena_bin_info_t *bin_info)
@@ -1669,7 +1669,7 @@ arena_dalloc_junk_small(void *ptr, arena_bin_info_t *bin_info)
 }
 #ifdef JEMALLOC_JET
 #undef arena_dalloc_junk_small
-#define	arena_dalloc_junk_small JEMALLOC_N(arena_dalloc_junk_small)
+#define arena_dalloc_junk_small JEMALLOC_N(arena_dalloc_junk_small)
 arena_dalloc_junk_small_t *arena_dalloc_junk_small =
     JEMALLOC_N(arena_dalloc_junk_small_impl);
 #endif
@@ -2031,7 +2031,7 @@ arena_dalloc_small(arena_t *arena, arena_chunk_t *chunk, void *ptr,
 
 #ifdef JEMALLOC_JET
 #undef arena_dalloc_junk_large
-#define	arena_dalloc_junk_large JEMALLOC_N(arena_dalloc_junk_large_impl)
+#define arena_dalloc_junk_large JEMALLOC_N(arena_dalloc_junk_large_impl)
 #endif
 static void
 arena_dalloc_junk_large(void *ptr, size_t usize)
@@ -2042,7 +2042,7 @@ arena_dalloc_junk_large(void *ptr, size_t usize)
 }
 #ifdef JEMALLOC_JET
 #undef arena_dalloc_junk_large
-#define	arena_dalloc_junk_large JEMALLOC_N(arena_dalloc_junk_large)
+#define arena_dalloc_junk_large JEMALLOC_N(arena_dalloc_junk_large)
 arena_dalloc_junk_large_t *arena_dalloc_junk_large =
     JEMALLOC_N(arena_dalloc_junk_large_impl);
 #endif
@@ -2173,7 +2173,7 @@ arena_ralloc_large_grow(arena_t *arena, arena_chunk_t *chunk, void *ptr,
 
 #ifdef JEMALLOC_JET
 #undef arena_ralloc_junk_large
-#define	arena_ralloc_junk_large JEMALLOC_N(arena_ralloc_junk_large_impl)
+#define arena_ralloc_junk_large JEMALLOC_N(arena_ralloc_junk_large_impl)
 #endif
 static void
 arena_ralloc_junk_large(void *ptr, size_t old_usize, size_t usize)
@@ -2186,7 +2186,7 @@ arena_ralloc_junk_large(void *ptr, size_t old_usize, size_t usize)
 }
 #ifdef JEMALLOC_JET
 #undef arena_ralloc_junk_large
-#define	arena_ralloc_junk_large JEMALLOC_N(arena_ralloc_junk_large)
+#define arena_ralloc_junk_large JEMALLOC_N(arena_ralloc_junk_large)
 arena_ralloc_junk_large_t *arena_ralloc_junk_large =
     JEMALLOC_N(arena_ralloc_junk_large_impl);
 #endif
@@ -2591,13 +2591,13 @@ bin_info_init(void)
 	arena_bin_info_t *bin_info;
 	size_t prev_run_size = PAGE;
 
-#define	BIN_INFO_INIT_bin_yes(index, size) \
+#define BIN_INFO_INIT_bin_yes(index, size) \
 	bin_info = &arena_bin_info[index];				\
 	bin_info->reg_size = size;					\
 	prev_run_size = bin_info_run_size_calc(bin_info, prev_run_size);\
 	bitmap_info_init(&bin_info->bitmap_info, bin_info->nregs);
-#define	BIN_INFO_INIT_bin_no(index, size)
-#define	SC(index, lg_grp, lg_delta, ndelta, bin, lg_delta_lookup)	\
+#define BIN_INFO_INIT_bin_no(index, size)
+#define SC(index, lg_grp, lg_delta, ndelta, bin, lg_delta_lookup)	\
 	BIN_INFO_INIT_bin_##bin(index, (ZU(1)<<lg_grp) + (ZU(ndelta)<<lg_delta))
 	SIZE_CLASSES
 #undef BIN_INFO_INIT_bin_yes

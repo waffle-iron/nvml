@@ -31,7 +31,7 @@
  */
 
 #ifndef	ALIGNED_ALLOC_H
-#define	ALIGNED_ALLOC_H
+#define ALIGNED_ALLOC_H
 
 #include <stddef.h>
 

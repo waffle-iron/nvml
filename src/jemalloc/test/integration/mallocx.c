@@ -1,8 +1,8 @@
 #include "test/jemalloc_test.h"
 
-#define	CHUNK 0x400000
-#define	MAXALIGN (((size_t)1) << 25)
-#define	NITER 4
+#define CHUNK 0x400000
+#define MAXALIGN (((size_t)1) << 25)
+#define NITER 4
 
 TEST_BEGIN(test_basic)
 {

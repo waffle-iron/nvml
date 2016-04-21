@@ -2,20 +2,20 @@
 #ifdef JEMALLOC_H_TYPES
 
 /* Maximum bitmap bit count is 2^LG_BITMAP_MAXBITS. */
-#define	LG_BITMAP_MAXBITS	LG_RUN_MAXREGS
+#define LG_BITMAP_MAXBITS	LG_RUN_MAXREGS
 
 typedef struct bitmap_level_s bitmap_level_t;
 typedef struct bitmap_info_s bitmap_info_t;
 typedef unsigned long bitmap_t;
-#define	LG_SIZEOF_BITMAP	LG_SIZEOF_LONG
+#define LG_SIZEOF_BITMAP	LG_SIZEOF_LONG
 
 /* Number of bits per group. */
-#define	LG_BITMAP_GROUP_NBITS		(LG_SIZEOF_BITMAP + 3)
-#define	BITMAP_GROUP_NBITS		(ZU(1) << LG_BITMAP_GROUP_NBITS)
-#define	BITMAP_GROUP_NBITS_MASK		(BITMAP_GROUP_NBITS-1)
+#define LG_BITMAP_GROUP_NBITS		(LG_SIZEOF_BITMAP + 3)
+#define BITMAP_GROUP_NBITS		(ZU(1) << LG_BITMAP_GROUP_NBITS)
+#define BITMAP_GROUP_NBITS_MASK		(BITMAP_GROUP_NBITS-1)
 
 /* Maximum number of levels possible. */
-#define	BITMAP_MAX_LEVELS						\
+#define BITMAP_MAX_LEVELS						\
     (LG_BITMAP_MAXBITS / LG_SIZEOF_BITMAP)				\
     + !!(LG_BITMAP_MAXBITS % LG_SIZEOF_BITMAP)
 

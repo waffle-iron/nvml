@@ -13,15 +13,15 @@
  * practice to consider any extra bytes reported by malloc_usable_size() as
  * usable space.
  */
-#define	JEMALLOC_VALGRIND_MAKE_MEM_NOACCESS(ptr, usize) do {		\
+#define JEMALLOC_VALGRIND_MAKE_MEM_NOACCESS(ptr, usize) do {		\
 	if (in_valgrind)						\
 		valgrind_make_mem_noaccess(ptr, usize);			\
 } while (0)
-#define	JEMALLOC_VALGRIND_MAKE_MEM_UNDEFINED(ptr, usize) do {		\
+#define JEMALLOC_VALGRIND_MAKE_MEM_UNDEFINED(ptr, usize) do {		\
 	if (in_valgrind)						\
 		valgrind_make_mem_undefined(ptr, usize);		\
 } while (0)
-#define	JEMALLOC_VALGRIND_MAKE_MEM_DEFINED(ptr, usize) do {		\
+#define JEMALLOC_VALGRIND_MAKE_MEM_DEFINED(ptr, usize) do {		\
 	if (in_valgrind)						\
 		valgrind_make_mem_defined(ptr, usize);			\
 } while (0)
@@ -30,11 +30,11 @@
  * calls must be embedded in macros rather than in functions so that when
  * Valgrind reports errors, there are no extra stack frames in the backtraces.
  */
-#define	JEMALLOC_VALGRIND_MALLOC(cond, ptr, usize, zero) do {		\
+#define JEMALLOC_VALGRIND_MALLOC(cond, ptr, usize, zero) do {		\
 	if (in_valgrind && cond)					\
 		VALGRIND_MALLOCLIKE_BLOCK(ptr, usize, p2rz(ptr), zero);	\
 } while (0)
-#define	JEMALLOC_VALGRIND_REALLOC(maybe_moved, ptr, usize,		\
+#define JEMALLOC_VALGRIND_REALLOC(maybe_moved, ptr, usize,		\
     ptr_maybe_null, old_ptr, old_usize, old_rzsize, old_ptr_maybe_null,	\
     zero) do {								\
 	if (in_valgrind) {						\
@@ -72,20 +72,20 @@
 		}							\
 	}								\
 } while (0)
-#define	JEMALLOC_VALGRIND_FREE(ptr, rzsize) do {			\
+#define JEMALLOC_VALGRIND_FREE(ptr, rzsize) do {			\
 	if (in_valgrind)						\
 		valgrind_freelike_block(ptr, rzsize);			\
 } while (0)
 #else
-#define	RUNNING_ON_VALGRIND	((unsigned)0)
-#define	JEMALLOC_VALGRIND_MAKE_MEM_NOACCESS(ptr, usize) do {} while (0)
-#define	JEMALLOC_VALGRIND_MAKE_MEM_UNDEFINED(ptr, usize) do {} while (0)
-#define	JEMALLOC_VALGRIND_MAKE_MEM_DEFINED(ptr, usize) do {} while (0)
-#define	JEMALLOC_VALGRIND_MALLOC(cond, ptr, usize, zero) do {} while (0)
-#define	JEMALLOC_VALGRIND_REALLOC(maybe_moved, ptr, usize,		\
+#define RUNNING_ON_VALGRIND	((unsigned)0)
+#define JEMALLOC_VALGRIND_MAKE_MEM_NOACCESS(ptr, usize) do {} while (0)
+#define JEMALLOC_VALGRIND_MAKE_MEM_UNDEFINED(ptr, usize) do {} while (0)
+#define JEMALLOC_VALGRIND_MAKE_MEM_DEFINED(ptr, usize) do {} while (0)
+#define JEMALLOC_VALGRIND_MALLOC(cond, ptr, usize, zero) do {} while (0)
+#define JEMALLOC_VALGRIND_REALLOC(maybe_moved, ptr, usize,		\
     ptr_maybe_null, old_ptr, old_usize, old_rzsize, old_ptr_maybe_null,	\
     zero) do {} while (0)
-#define	JEMALLOC_VALGRIND_FREE(ptr, rzsize) do {} while (0)
+#define JEMALLOC_VALGRIND_FREE(ptr, rzsize) do {} while (0)
 #endif
 
 #endif /* JEMALLOC_H_TYPES */

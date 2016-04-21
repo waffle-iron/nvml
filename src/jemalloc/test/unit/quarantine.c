@@ -1,8 +1,8 @@
 #include "test/jemalloc_test.h"
 
-#define	QUARANTINE_SIZE		8192
-#define	STRINGIFY_HELPER(x)	#x
-#define	STRINGIFY(x)		STRINGIFY_HELPER(x)
+#define QUARANTINE_SIZE		8192
+#define STRINGIFY_HELPER(x)	#x
+#define STRINGIFY(x)		STRINGIFY_HELPER(x)
 
 #ifdef JEMALLOC_FILL
 const char *malloc_conf = "abort:false,junk:true,redzone:true,quarantine:"
@@ -21,8 +21,8 @@ quarantine_clear(void)
 
 TEST_BEGIN(test_quarantine)
 {
-#define	SZ		ZU(256)
-#define	NQUARANTINED	(QUARANTINE_SIZE/SZ)
+#define SZ		ZU(256)
+#define NQUARANTINED	(QUARANTINE_SIZE/SZ)
 	void *quarantined[NQUARANTINED+1];
 	size_t i, j;
 

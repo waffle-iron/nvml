@@ -30,7 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #ifndef	HASHMAP_H
-#define	HASHMAP_H
+#define HASHMAP_H
 
 /* common API provided by both implementations */
 

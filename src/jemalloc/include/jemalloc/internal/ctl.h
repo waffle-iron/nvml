@@ -73,7 +73,7 @@ void	ctl_prefork(void);
 void	ctl_postfork_parent(void);
 void	ctl_postfork_child(void);
 
-#define	xmallctl(name, oldp, oldlenp, newp, newlen) do {		\
+#define xmallctl(name, oldp, oldlenp, newp, newlen) do {		\
 	if (je_mallctl(name, oldp, oldlenp, newp, newlen)		\
 	    != 0) {							\
 		malloc_printf(						\
@@ -83,7 +83,7 @@ void	ctl_postfork_child(void);
 	}								\
 } while (0)
 
-#define	xmallctlnametomib(name, mibp, miblenp) do {			\
+#define xmallctlnametomib(name, mibp, miblenp) do {			\
 	if (je_mallctlnametomib(name, mibp, miblenp) != 0) {		\
 		malloc_printf("<jemalloc>: Failure in "			\
 		    "xmallctlnametomib(\"%s\", ...)\n", name);		\
@@ -91,7 +91,7 @@ void	ctl_postfork_child(void);
 	}								\
 } while (0)
 
-#define	xmallctlbymib(mib, miblen, oldp, oldlenp, newp, newlen) do {	\
+#define xmallctlbymib(mib, miblen, oldp, oldlenp, newp, newlen) do {	\
 	if (je_mallctlbymib(mib, miblen, oldp, oldlenp, newp,		\
 	    newlen) != 0) {						\
 		malloc_write(						\

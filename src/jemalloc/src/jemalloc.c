@@ -1,4 +1,4 @@
-#define	JEMALLOC_C_
+#define JEMALLOC_C_
 #include "jemalloc/internal/jemalloc_internal.h"
 
 /******************************************************************************/
@@ -305,23 +305,23 @@ arenas_tsd_extend(tsd_pool_t *tsd, unsigned len)
 	if (npools < POOLS_MIN)
 		npools = POOLS_MIN;
 
-	unsigned *tseqno = je_base_malloc(npools * sizeof (unsigned));
+	unsigned *tseqno = je_base_malloc(npools * sizeof(unsigned));
 	if (tseqno == NULL)
 		return (true);
 
 	if (tsd->seqno != NULL)
-		memcpy(tseqno, tsd->seqno, tsd->npools * sizeof (unsigned));
-	memset(&tseqno[tsd->npools], 0, (npools - tsd->npools) * sizeof (unsigned));
+		memcpy(tseqno, tsd->seqno, tsd->npools * sizeof(unsigned));
+	memset(&tseqno[tsd->npools], 0, (npools - tsd->npools) * sizeof(unsigned));
 
-	arena_t **tarenas = je_base_malloc(npools * sizeof (arena_t *));
+	arena_t **tarenas = je_base_malloc(npools * sizeof(arena_t *));
 	if (tarenas == NULL) {
 		je_base_free(tseqno);
 		return (true);
 	}
 
 	if (tsd->arenas != NULL)
-		memcpy(tarenas, tsd->arenas, tsd->npools * sizeof (arena_t *));
-	memset(&tarenas[tsd->npools], 0, (npools - tsd->npools) * sizeof (arena_t *));
+		memcpy(tarenas, tsd->arenas, tsd->npools * sizeof(arena_t *));
+	memset(&tarenas[tsd->npools], 0, (npools - tsd->npools) * sizeof(arena_t *));
 
 	je_base_free(tsd->seqno);
 	tsd->seqno = tseqno;
@@ -614,9 +614,9 @@ malloc_conf_init(void)
 
 		while (*opts != '\0' && malloc_conf_next(&opts, &k, &klen, &v,
 		    &vlen) == false) {
-#define	CONF_MATCH(n)							\
+#define CONF_MATCH(n)							\
 	(sizeof(n)-1 == klen && strncmp(n, k, klen) == 0)
-#define	CONF_HANDLE_BOOL(o, n, cont)					\
+#define CONF_HANDLE_BOOL(o, n, cont)					\
 			if (CONF_MATCH(n)) {				\
 				if (strncmp("true", v, vlen) == 0 &&	\
 				    vlen == sizeof("true")-1)		\
@@ -632,7 +632,7 @@ malloc_conf_init(void)
 				if (cont)				\
 					continue;			\
 			}
-#define	CONF_HANDLE_SIZE_T(o, n, min, max, clip)			\
+#define CONF_HANDLE_SIZE_T(o, n, min, max, clip)			\
 			if (CONF_MATCH(n)) {				\
 				uintmax_t um;				\
 				char *end;				\
@@ -663,7 +663,7 @@ malloc_conf_init(void)
 				}					\
 				continue;				\
 			}
-#define	CONF_HANDLE_SSIZE_T(o, n, min, max)				\
+#define CONF_HANDLE_SSIZE_T(o, n, min, max)				\
 			if (CONF_MATCH(n)) {				\
 				long l;					\
 				char *end;				\
@@ -684,7 +684,7 @@ malloc_conf_init(void)
 					o = l;				\
 				continue;				\
 			}
-#define	CONF_HANDLE_CHAR_P(o, n, d)					\
+#define CONF_HANDLE_CHAR_P(o, n, d)					\
 			if (CONF_MATCH(n)) {				\
 				size_t cpylen = (vlen <=		\
 				    sizeof(o)-1) ? vlen :		\
@@ -1407,9 +1407,9 @@ je_valloc(size_t size)
  * is_malloc(je_malloc) is some macro magic to detect if jemalloc_defs.h has
  * #define je_malloc malloc
  */
-#define	malloc_is_malloc 1
-#define	is_malloc_(a) malloc_is_ ## a
-#define	is_malloc(a) is_malloc_(a)
+#define malloc_is_malloc 1
+#define is_malloc_(a) malloc_is_ ## a
+#define is_malloc(a) is_malloc_(a)
 
 #if ((is_malloc(je_malloc) == 1) && defined(__GLIBC__) && !defined(__UCLIBC__))
 /*
@@ -1512,15 +1512,15 @@ je_pool_create(void *addr, size_t size, int zeroed)
 	if (pool_id == npools && npools < POOLS_MAX) {
 		size_t npools_new = npools * 2;
 		pool_t **pools_new = base_alloc(&base_pool,
-					npools_new * sizeof (pool_t *));
+					npools_new * sizeof(pool_t *));
 		if (pools_new == NULL) {
 			malloc_mutex_unlock(&pools_lock);
 			return (NULL);
 		}
 
-		memcpy(pools_new, pools, npools * sizeof (pool_t *));
+		memcpy(pools_new, pools, npools * sizeof(pool_t *));
 		memset(&pools_new[npools], 0,
-				(npools_new - npools) * sizeof (pool_t *));
+				(npools_new - npools) * sizeof(pool_t *));
 
 		pools = pools_new;
 		npools = npools_new;
@@ -1534,11 +1534,11 @@ je_pool_create(void *addr, size_t size, int zeroed)
 	}
 
 	if (!zeroed)
-		memset(addr, 0, sizeof (pool_t));
+		memset(addr, 0, sizeof(pool_t));
 
 	/* preinit base allocator in unused space, align the address to the cache line */
 	pool->base_next_addr = (void *)CACHELINE_CEILING((uintptr_t)addr +
-		sizeof (pool_t));
+		sizeof(pool_t));
 	pool->base_past_addr = (void *)((uintptr_t)addr + size);
 
 	/* prepare pool and internal structures */
@@ -1560,7 +1560,7 @@ je_pool_create(void *addr, size_t size, int zeroed)
 
 	malloc_mutex_unlock(&pools_lock);
 
-	pool->memory_range_list = base_alloc(pool, sizeof (*pool->memory_range_list));
+	pool->memory_range_list = base_alloc(pool, sizeof(*pool->memory_range_list));
 
 	/* pointer to the address of chunks, align the address to chunksize */
 	void *usable_addr = (void*)CHUNK_CEILING((uintptr_t)pool->base_next_addr);
@@ -1889,7 +1889,7 @@ je_pool_extend(pool_t *pool, void *addr, size_t size, int zeroed)
 	/* preallocate the chunk tree nodes for the max possible number of chunks */
 	nodes_number = base_node_prealloc(pool, nodes_number);
 	pool_memory_range_node_t *node = base_alloc(pool,
-		sizeof (*pool->memory_range_list));
+		sizeof(*pool->memory_range_list));
 
 	if (nodes_number > 0 || node == NULL) {
 		/*
@@ -1907,7 +1907,7 @@ je_pool_extend(pool_t *pool, void *addr, size_t size, int zeroed)
 		assert(nodes_number == 0);
 
 		if (node == NULL)
-			node = base_alloc(pool, sizeof (*pool->memory_range_list));
+			node = base_alloc(pool, sizeof(*pool->memory_range_list));
 		assert(node != NULL);
 
 		/* pointer to the address of chunks, align the address to chunksize */

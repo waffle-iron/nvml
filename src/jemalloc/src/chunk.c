@@ -1,4 +1,4 @@
-#define	JEMALLOC_CHUNK_C_
+#define JEMALLOC_CHUNK_C_
 #include "jemalloc/internal/jemalloc_internal.h"
 
 /******************************************************************************/

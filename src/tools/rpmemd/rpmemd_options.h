@@ -37,7 +37,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define	RPMEMD_DEFAULT_LOG_FILE	("/var/log/" DAEMON_NAME ".log")
+#define RPMEMD_DEFAULT_LOG_FILE	("/var/log/" DAEMON_NAME ".log")
 
 struct rpmemd_options {
 	bool foreground;
@@ -51,6 +51,6 @@ struct rpmemd_options {
 static inline void
 rpmemd_options_default(struct rpmemd_options *opts)
 {
-	memset(opts, 0, sizeof (*opts));
+	memset(opts, 0, sizeof(*opts));
 	opts->log_file = RPMEMD_DEFAULT_LOG_FILE;
 }

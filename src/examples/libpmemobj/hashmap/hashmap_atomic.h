@@ -30,7 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #ifndef	HASHMAP_ATOMIC_H
-#define	HASHMAP_ATOMIC_H
+#define HASHMAP_ATOMIC_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -38,7 +38,7 @@
 #include <libpmemobj.h>
 
 #ifndef	HASHMAP_ATOMIC_TYPE_OFFSET
-#define	HASHMAP_ATOMIC_TYPE_OFFSET 1000
+#define HASHMAP_ATOMIC_TYPE_OFFSET 1000
 #endif
 
 struct hashmap_atomic;

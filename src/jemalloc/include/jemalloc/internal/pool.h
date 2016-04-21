@@ -21,7 +21,7 @@ do {						\
 (name).pool = (p);				\
 } while (0)
 
-#define	TSD_POOL_INITIALIZER		JEMALLOC_ARG_CONCAT({.npools = 0, .arenas = NULL, .seqno = NULL })
+#define TSD_POOL_INITIALIZER		JEMALLOC_ARG_CONCAT({.npools = 0, .arenas = NULL, .seqno = NULL })
 
 
 #endif /* JEMALLOC_H_TYPES */

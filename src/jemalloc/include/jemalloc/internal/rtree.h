@@ -14,7 +14,7 @@ typedef struct rtree_s rtree_t;
  * Size of each radix tree node (must be a power of 2).  This impacts tree
  * depth.
  */
-#define	RTREE_NODESIZE (1U << 16)
+#define RTREE_NODESIZE (1U << 16)
 
 typedef void *(rtree_alloc_t)(pool_t *, size_t);
 typedef void (rtree_dalloc_t)(pool_t *, void *);
@@ -57,7 +57,7 @@ bool	rtree_set(rtree_t *rtree, uintptr_t key, uint8_t val);
 #endif
 
 #if (defined(JEMALLOC_ENABLE_INLINE) || defined(JEMALLOC_RTREE_C_))
-#define	RTREE_GET_GENERATE(f)						\
+#define RTREE_GET_GENERATE(f)						\
 /* The least significant bits of the key are ignored. */		\
 JEMALLOC_INLINE uint8_t							\
 f(rtree_t *rtree, uintptr_t key)					\
@@ -108,8 +108,8 @@ RTREE_GET_GENERATE(rtree_get_locked)
 #  undef RTREE_GET_VALIDATE
 #endif
 
-#define	RTREE_LOCK(l)
-#define	RTREE_UNLOCK(l)
+#define RTREE_LOCK(l)
+#define RTREE_UNLOCK(l)
 #ifdef JEMALLOC_DEBUG
    /*
     * Suppose that it were possible for a jemalloc-allocated chunk to be

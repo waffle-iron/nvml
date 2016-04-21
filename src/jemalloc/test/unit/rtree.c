@@ -80,8 +80,8 @@ TEST_BEGIN(test_rtree_random)
 {
 	unsigned i;
 	sfmt_t *sfmt;
-#define	NSET 100
-#define	SEED 42
+#define NSET 100
+#define SEED 42
 
 	sfmt = init_gen_rand(SEED);
 	for (i = 1; i <= (sizeof(uintptr_t) << 3); i++) {

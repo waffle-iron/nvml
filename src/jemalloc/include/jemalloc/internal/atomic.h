@@ -9,10 +9,10 @@
 /******************************************************************************/
 #ifdef JEMALLOC_H_EXTERNS
 
-#define	atomic_read_uint64(p)	atomic_add_uint64(p, 0)
-#define	atomic_read_uint32(p)	atomic_add_uint32(p, 0)
-#define	atomic_read_z(p)	atomic_add_z(p, 0)
-#define	atomic_read_u(p)	atomic_add_u(p, 0)
+#define atomic_read_uint64(p)	atomic_add_uint64(p, 0)
+#define atomic_read_uint32(p)	atomic_add_uint32(p, 0)
+#define atomic_read_z(p)	atomic_add_z(p, 0)
+#define atomic_read_u(p)	atomic_add_u(p, 0)
 
 #endif /* JEMALLOC_H_EXTERNS */
 /******************************************************************************/

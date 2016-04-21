@@ -1,12 +1,12 @@
-#define	JEMALLOC_STATS_C_
+#define JEMALLOC_STATS_C_
 #include "jemalloc/internal/jemalloc_internal.h"
 
-#define	CTL_GET(n, v, t) do {						\
+#define CTL_GET(n, v, t) do {						\
 	size_t sz = sizeof(t);						\
 	xmallctl(n, v, &sz, NULL, 0);					\
 } while (0)
 
-#define	CTL_P_GET_ARRAY(n, v, t, c) do {				\
+#define CTL_P_GET_ARRAY(n, v, t, c) do {				\
 	size_t mib[8];							\
 	size_t miblen = sizeof(mib) / sizeof(size_t);			\
 	size_t sz = sizeof(t) * c;					\
@@ -15,9 +15,9 @@
 	xmallctlbymib(mib, miblen, v, &sz, NULL, 0);			\
 } while (0)
 
-#define	CTL_P_GET(n, v, t) CTL_P_GET_ARRAY(n, v, t, 1)
+#define CTL_P_GET(n, v, t) CTL_P_GET_ARRAY(n, v, t, 1)
 
-#define	CTL_PI_GET(n, v, t) do {					\
+#define CTL_PI_GET(n, v, t) do {					\
 	size_t mib[8];							\
 	char buf[256];							\
 	snprintf(buf, sizeof(buf), n, p);				\
@@ -29,7 +29,7 @@
 	xmallctlbymib(mib, miblen, v, &sz, NULL, 0);			\
 } while (0)
 
-#define	CTL_PJ_GET(n, v, t) do {					\
+#define CTL_PJ_GET(n, v, t) do {					\
 	size_t mib[8];							\
 	char buf[256];							\
 	snprintf(buf, sizeof(buf), n, p);				\
@@ -41,7 +41,7 @@
 	xmallctlbymib(mib, miblen, v, &sz, NULL, 0);			\
 } while (0)
 
-#define	CTL_PIJ_GET(n, v, t) do {					\
+#define CTL_PIJ_GET(n, v, t) do {					\
 	size_t mib[8];							\
 	char buf[256];							\
 	snprintf(buf, sizeof(buf), n, p);				\
@@ -373,25 +373,25 @@ stats_print(pool_t *pool, void (*write_cb)(void *, const char *), void *cbopaque
 		malloc_cprintf(write_cb, cbopaque, "Assertions %s\n",
 		    bv ? "enabled" : "disabled");
 
-#define	OPT_WRITE_BOOL(n)						\
+#define OPT_WRITE_BOOL(n)						\
 		if ((err = je_mallctl("opt."#n, &bv, &bsz, NULL, 0))	\
 		    == 0) {						\
 			malloc_cprintf(write_cb, cbopaque,		\
 			    "  opt."#n": %s\n", bv ? "true" : "false");	\
 		}
-#define	OPT_WRITE_SIZE_T(n)						\
+#define OPT_WRITE_SIZE_T(n)						\
 		if ((err = je_mallctl("opt."#n, &sv, &ssz, NULL, 0))	\
 		    == 0) {						\
 			malloc_cprintf(write_cb, cbopaque,		\
 			"  opt."#n": %zu\n", sv);			\
 		}
-#define	OPT_WRITE_SSIZE_T(n)						\
+#define OPT_WRITE_SSIZE_T(n)						\
 		if ((err = je_mallctl("opt."#n, &ssv, &sssz, NULL, 0))	\
 		    == 0) {						\
 			malloc_cprintf(write_cb, cbopaque,		\
 			    "  opt."#n": %zd\n", ssv);			\
 		}
-#define	OPT_WRITE_CHAR_P(n)						\
+#define OPT_WRITE_CHAR_P(n)						\
 		if ((err = je_mallctl("opt."#n, &cpv, &cpsz, NULL, 0))	\
 		    == 0) {						\
 			malloc_cprintf(write_cb, cbopaque,		\

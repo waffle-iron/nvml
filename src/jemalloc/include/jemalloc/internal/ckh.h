@@ -9,15 +9,15 @@ typedef void ckh_hash_t (const void *, size_t[2]);
 typedef bool ckh_keycomp_t (const void *, const void *);
 
 /* Maintain counters used to get an idea of performance. */
-/* #define	CKH_COUNT */
+/* #define CKH_COUNT */
 /* Print counter values in ckh_delete() (requires CKH_COUNT). */
-/* #define	CKH_VERBOSE */
+/* #define CKH_VERBOSE */
 
 /*
  * There are 2^LG_CKH_BUCKET_CELLS cells in each hash table bucket.  Try to fit
  * one bucket per L1 cache line.
  */
-#define	LG_CKH_BUCKET_CELLS (LG_CACHELINE - LG_SIZEOF_PTR - 1)
+#define LG_CKH_BUCKET_CELLS (LG_CACHELINE - LG_SIZEOF_PTR - 1)
 
 #endif /* JEMALLOC_H_TYPES */
 /******************************************************************************/
@@ -40,8 +40,8 @@ struct ckh_s {
 #endif
 
 	/* Used for pseudo-random number generation. */
-#define	CKH_A		1103515241
-#define	CKH_C		12347
+#define CKH_A		1103515241
+#define CKH_C		12347
 	uint32_t	prng_state;
 
 	/* Total number of items. */

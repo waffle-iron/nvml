@@ -47,11 +47,11 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-#define	APP_NAME "ctrld"
-#define	BUFF_SIZE 4096
+#define APP_NAME "ctrld"
+#define BUFF_SIZE 4096
 
 /* table of signal names */
-#define	SIGNAL_2_STR(sig) [sig] = #sig
+#define SIGNAL_2_STR(sig) [sig] = #sig
 static const char *signal2str[] = {
 	SIGNAL_2_STR(SIGHUP),
 	SIGNAL_2_STR(SIGINT),
@@ -120,7 +120,7 @@ alloc_argv(unsigned argc, char *argv[], unsigned off)
 		return NULL;
 
 	unsigned nargc = argc - off;
-	char **nargv = malloc((nargc + 1) * sizeof (char *));
+	char **nargv = malloc((nargc + 1) * sizeof(char *));
 	if (!nargv)
 		return NULL;
 
@@ -426,7 +426,7 @@ get_inodes(pid_t pid, struct inodes *inodes)
 			continue;
 
 		/* add inode to a list */
-		struct inode_item *inode_item = malloc(sizeof (*inode_item));
+		struct inode_item *inode_item = malloc(sizeof(*inode_item));
 		if (!inode_item) {
 			perror("malloc inode item");
 			exit(1);
@@ -463,7 +463,7 @@ static int
 has_port(pid_t pid, unsigned short port)
 {
 	struct inodes inodes;
-	memset(&inodes, 0, sizeof (inodes));
+	memset(&inodes, 0, sizeof(inodes));
 
 	int ret = get_inodes(pid, &inodes);
 	if (ret < 0)

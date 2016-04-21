@@ -18,20 +18,20 @@
  *
  *   (RUN_MAX_OVRHD / (reg_interval << (3+RUN_BFP))
  */
-#define	RUN_BFP			12
+#define RUN_BFP			12
 /*                                    \/   Implicit binary fixed point. */
-#define	RUN_MAX_OVRHD		0x0000003dU
-#define	RUN_MAX_OVRHD_RELAX	0x00001800U
+#define RUN_MAX_OVRHD		0x0000003dU
+#define RUN_MAX_OVRHD_RELAX	0x00001800U
 
 /* Maximum number of regions in one run. */
-#define	LG_RUN_MAXREGS		11
-#define	RUN_MAXREGS		(1U << LG_RUN_MAXREGS)
+#define LG_RUN_MAXREGS		11
+#define RUN_MAXREGS		(1U << LG_RUN_MAXREGS)
 
 /*
  * Minimum redzone size.  Redzones may be larger than this if necessary to
  * preserve region alignment.
  */
-#define	REDZONE_MINSIZE		16
+#define REDZONE_MINSIZE		16
 
 /*
  * The minimum ratio of active:dirty pages per arena is computed as:
@@ -41,7 +41,7 @@
  * So, supposing that opt_lg_dirty_mult is 3, there can be no less than 8 times
  * as many active pages as dirty pages.
  */
-#define	LG_DIRTY_MULT_DEFAULT	3
+#define LG_DIRTY_MULT_DEFAULT	3
 
 typedef struct arena_chunk_map_s arena_chunk_map_t;
 typedef struct arena_chunk_s arena_chunk_t;
@@ -143,17 +143,17 @@ struct arena_chunk_map_s {
 	 *     ssssssss ssssssss ssss++++ ++++D-LA
 	 */
 	size_t				bits;
-#define	CHUNK_MAP_BININD_SHIFT	4
-#define	BININD_INVALID		((size_t)0xffU)
+#define CHUNK_MAP_BININD_SHIFT	4
+#define BININD_INVALID		((size_t)0xffU)
 /*     CHUNK_MAP_BININD_MASK == (BININD_INVALID << CHUNK_MAP_BININD_SHIFT) */
-#define	CHUNK_MAP_BININD_MASK	((size_t)0xff0U)
-#define	CHUNK_MAP_BININD_INVALID CHUNK_MAP_BININD_MASK
-#define	CHUNK_MAP_FLAGS_MASK	((size_t)0xcU)
-#define	CHUNK_MAP_DIRTY		((size_t)0x8U)
-#define	CHUNK_MAP_UNZEROED	((size_t)0x4U)
-#define	CHUNK_MAP_LARGE		((size_t)0x2U)
-#define	CHUNK_MAP_ALLOCATED	((size_t)0x1U)
-#define	CHUNK_MAP_KEY		CHUNK_MAP_ALLOCATED
+#define CHUNK_MAP_BININD_MASK	((size_t)0xff0U)
+#define CHUNK_MAP_BININD_INVALID CHUNK_MAP_BININD_MASK
+#define CHUNK_MAP_FLAGS_MASK	((size_t)0xcU)
+#define CHUNK_MAP_DIRTY		((size_t)0x8U)
+#define CHUNK_MAP_UNZEROED	((size_t)0x4U)
+#define CHUNK_MAP_LARGE		((size_t)0x2U)
+#define CHUNK_MAP_ALLOCATED	((size_t)0x1U)
+#define CHUNK_MAP_KEY		CHUNK_MAP_ALLOCATED
 };
 typedef rb_tree(arena_chunk_map_t) arena_avail_tree_t;
 typedef rb_tree(arena_chunk_map_t) arena_run_tree_t;
@@ -408,7 +408,7 @@ extern uint32_t const	small_bin2size_tab[NBINS];
 extern arena_bin_info_t	arena_bin_info[NBINS];
 
 /* Number of large size classes. */
-#define			nlclasses (chunk_npages - map_bias)
+#define 		nlclasses (chunk_npages - map_bias)
 
 void	*arena_chunk_alloc_huge(arena_t *arena, void *new_addr, size_t size,
     size_t alignment, bool *zero);
@@ -1008,8 +1008,8 @@ arena_run_regind(arena_run_t *run, arena_bin_info_t *bin_info, const void *ptr)
 		 * divide by 0, and 1 and 2 are both powers of two, which are
 		 * handled above.
 		 */
-#define	SIZE_INV_SHIFT	((sizeof(unsigned) << 3) - LG_RUN_MAXREGS)
-#define	SIZE_INV(s)	(((1U << SIZE_INV_SHIFT) / (s)) + 1)
+#define SIZE_INV_SHIFT	((sizeof(unsigned) << 3) - LG_RUN_MAXREGS)
+#define SIZE_INV(s)	(((1U << SIZE_INV_SHIFT) / (s)) + 1)
 		static const unsigned interval_invs[] = {
 		    SIZE_INV(3),
 		    SIZE_INV(4), SIZE_INV(5), SIZE_INV(6), SIZE_INV(7),
