@@ -37,7 +37,11 @@
  */
 
 #include <libpmemobj/persistent_ptr.hpp>
+#include <libpmemobj/make_persistent.hpp>
 #include <libpmemobj/p.hpp>
+#include <libpmemobj/transaction.hpp>
+#include <libpmemobj/pool.hpp>
+#include <libpmemobj.h>
 #include <unistd.h>
 #include <math.h>
 #include <stdio.h>
@@ -102,13 +106,11 @@ class pmem_queue
 	 * Inserts a new element at the end of the queue.
 	 */
 	void
-	push(PMEMobjpool *pop, uint64_t value)
+	push(pool_base &pop, uint64_t value)
 	{
-		int error = 0;
-		TX_BEGIN(pop)
-		{
-			persistent_ptr<pmem_entry> n =
-				pmemobj_tx_alloc(sizeof(pmem_entry), 0);
+		transaction::exec_tx(pop, [&] {
+			auto n = make_persistent<pmem_entry>();
+
 			n->value = value;
 			n->next = nullptr;
 
@@ -118,41 +120,29 @@ class pmem_queue
 				tail->next = n;
 				tail = n;
 			}
-		}
-		TX_ONABORT { error = 1; }
-		TX_END
-
-		if (error)
-			throw std::runtime_error("transaction aborted");
+		});
 	}
 
 	/*
 	 * Removes the first element in the queue.
 	 */
 	uint64_t
-	pop(PMEMobjpool *pop)
+	pop(pool_base &pop)
 	{
 		uint64_t ret = 0;
-		int error = 0;
-		TX_BEGIN(pop)
-		{
+		transaction::exec_tx(pop, [&] {
 			if (head == nullptr)
-				pmemobj_tx_abort(EINVAL);
+				transaction::abort(EINVAL);
 
 			ret = head->value;
 			auto n = head->next;
 
-			pmemobj_tx_free(head.raw());
+			delete_persistent<pmem_entry>(head);
 			head = n;
 
 			if (head == nullptr)
 				tail = nullptr;
-		}
-		TX_ONABORT { error = 1; }
-		TX_END
-
-		if (error)
-			throw std::runtime_error("transaction aborted");
+		});
 
 		return ret;
 	}
@@ -185,22 +175,16 @@ main(int argc, char *argv[])
 
 	queue_op op = parse_queue_op(argv[2]);
 
-	PMEMobjpool *pop = NULL;
+	pool<pmem_queue> pop;
 
 	if (access(path, F_OK) != 0) {
-		if ((pop = pmemobj_create(path, LAYOUT, PMEMOBJ_MIN_POOL,
-					  S_IRWXU)) == NULL) {
-			std::cerr << "failed to create pool" << std::endl;
-			return 1;
-		}
+		pop = pool<pmem_queue>::create(path, LAYOUT, PMEMOBJ_MIN_POOL,
+					       S_IRWXU);
 	} else {
-		if ((pop = pmemobj_open(path, LAYOUT)) == NULL) {
-			std::cerr << "failed to open pool" << std::endl;
-			return 1;
-		}
+		pop = pool<pmem_queue>::open(path, LAYOUT);
 	}
 
-	persistent_ptr<pmem_queue> q = pmemobj_root(pop, sizeof(pmem_queue));
+	auto q = pop.get_root();
 	switch (op) {
 		case QUEUE_PUSH:
 			q->push(pop, atoll(argv[3]));
@@ -216,7 +200,7 @@ main(int argc, char *argv[])
 			break;
 	}
 
-	pmemobj_close(pop);
+	pop.close();
 
 	return 0;
 }
