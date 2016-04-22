@@ -13,9 +13,8 @@ before_install:
   - echo "PMEM_FS_DIR_FORCE_PMEM=1" >> src/test/testconfig.sh
   - sudo mount -t tmpfs none /tmp -osize=4G
 script:
-  - if [ $MAKE_DPKG -eq 0 ]; then make check-license && make cstyle && make -j2 USE_LIBUNWIND=1 && make -j2 test USE_LIBUNWIND=1 && make check && make DESTDIR=/tmp source; fi
-  - if [ $MAKE_DPKG -eq 1 ]; then make -j2 dpkg; fi
-env:
-  - NOTTY=1 MAKE_DPKG=0 EXTRA_CFLAGS=-DUSE_VALGRIND
-  - NOTTY=1 MAKE_DPKG=0 EXTRA_CFLAGS=
-  - NOTTY=1 MAKE_DPKG=1
+  - which clang-format
+  - clang-format --version
+  - ls /usr/local/clang
+  - sudo apt-cache search clang-format
+  - clang-format --version
