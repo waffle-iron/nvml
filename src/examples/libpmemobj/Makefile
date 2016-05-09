@@ -37,11 +37,10 @@ include ../../common.inc
 
 PROGS = manpage btree pi lists
 DIRS = pminvaders pmemlog pmemblk string_store string_store_tx\
-	string_store_tx_type hashmap tree_map pmemobjfs map libart array\
-	cpp_map
+	string_store_tx_type hashmap tree_map pmemobjfs map libart array
 
-ifeq ($(call check_cxx_flags, -std=c++11), y)
-DIRS += cpp pman
+ifeq ($(call cxx_ok), y)
+DIRS += cpp pman cpp_map
 endif
 
 LIBS = -lpmemobj -lpmem -pthread -lm -pthread
