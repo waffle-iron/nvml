@@ -33,24 +33,26 @@
 #ifndef EXAMPLES_CTREE_MAP_PERSISTENT_HPP
 #define EXAMPLES_CTREE_MAP_PERSISTENT_HPP
 #include <cstdint>
-#include <stdlib.h>
 #include <functional>
+#include <stdlib.h>
 
-#include <libpmemobj/persistent_ptr.hpp>
 #include <libpmemobj/make_persistent.hpp>
 #include <libpmemobj/make_persistent_atomic.hpp>
-#include <libpmemobj/pool.hpp>
 #include <libpmemobj/p.hpp>
+#include <libpmemobj/persistent_ptr.hpp>
+#include <libpmemobj/pool.hpp>
 #include <libpmemobj/transaction.hpp>
 #include <libpmemobj/utils.hpp>
 
-#define	BIT_IS_SET(n, i) (!!((n) & (1ULL << (i))))
+#define BIT_IS_SET(n, i) (!!((n) & (1ULL << (i))))
 
-namespace {
-	namespace nvobj = nvml::obj;
+namespace
+{
+namespace nvobj = nvml::obj;
 }
 
-namespace examples {
+namespace examples
+{
 
 /**
  * C++ implementation of a persistent ctree.
@@ -62,7 +64,6 @@ namespace examples {
 template <typename K, typename T>
 class ctree_map_p {
 public:
-
 	/** Convenience typedef for the key type. */
 	typedef K key_type;
 
@@ -75,10 +76,11 @@ public:
 	/**
 	 * Detault constructor.
 	 */
-	ctree_map_p() {
+	ctree_map_p()
+	{
 		auto pop = nvml::pool_by_vptr(this);
 
-		nvobj::transaction::exec_tx(pop, [&]{
+		nvobj::transaction::exec_tx(pop, [&] {
 			nvobj::make_persistent_atomic<entry>(pop, root);
 		});
 	}
@@ -94,7 +96,8 @@ public:
 	 * @return 0 on success, negative values on error.
 	 */
 	int
-	insert(uint64_t key, value_type value) {
+	insert(uint64_t key, value_type value)
+	{
 		auto dest_entry = root;
 		while (dest_entry->inode != nullptr) {
 			auto n = dest_entry->inode;
@@ -103,12 +106,13 @@ public:
 
 		entry e(key, value);
 		auto pop = nvml::pool_by_vptr(this);
-		nvobj::transaction::exec_tx(pop, [&]{
+		nvobj::transaction::exec_tx(pop, [&] {
 			if (dest_entry->key == 0 || dest_entry->key == key) {
 				nvobj::delete_persistent<T>(dest_entry->value);
 				*dest_entry = e;
 			} else {
-				insert_leaf(&e, find_crit_bit(dest_entry->key, key));
+				insert_leaf(&e, find_crit_bit(dest_entry->key,
+							      key));
 			}
 		});
 
@@ -126,11 +130,12 @@ public:
 	 *
 	 * @return 0 on success, negative values on error.
 	 */
-	template<typename ...Args>
+	template <typename... Args>
 	int
-	insert_new(key_type key,const Args &...args) {
+	insert_new(key_type key, const Args &... args)
+	{
 		auto pop = nvml::pool_by_vptr(this);
-		nvobj::transaction::exec_tx(pop, [&]{
+		nvobj::transaction::exec_tx(pop, [&] {
 			return insert(key, nvobj::make_persistent<T>(args...));
 		});
 
@@ -147,7 +152,8 @@ public:
 	 * @return The value if it is in the tree, nullptr otherwise.
 	 */
 	value_type
-	remove(key_type key) {
+	remove(key_type key)
+	{
 		nvobj::persistent_ptr<entry> parent = nullptr;
 		auto leaf = get_leaf(key, &parent);
 
@@ -157,15 +163,18 @@ public:
 		auto ret = leaf->value;
 
 		auto pop = nvml::pool_by_vptr(this);
-		nvobj::transaction::exec_tx(pop, [&]{
+		nvobj::transaction::exec_tx(pop, [&] {
 			if (parent == nullptr) {
 				leaf->key = 0;
 				leaf->value = nullptr;
 			} else {
 				auto n = parent->inode;
-				*parent = *(n->entries[parent->inode->entries[0]->key == leaf->key]);
+				*parent = *(
+					n->entries[parent->inode->entries[0]
+							   ->key == leaf->key]);
 
-				/* cleanup both entries and the unnecessary node */
+				/* cleanup both entries and the unnecessary node
+				 */
 				nvobj::delete_persistent<entry>(n->entries[0]);
 				nvobj::delete_persistent<entry>(n->entries[1]);
 				nvobj::delete_persistent<node>(n);
@@ -183,11 +192,11 @@ public:
 	 * @return 0 on success, negative values on error.
 	 */
 	int
-	remove_free(key_type key) {
+	remove_free(key_type key)
+	{
 		auto pop = nvml::pool_by_vptr(this);
-		nvobj::transaction::exec_tx(pop, [&]{
-			nvobj::delete_persistent<T>(remove(key));
-		});
+		nvobj::transaction::exec_tx(
+			pop, [&] { nvobj::delete_persistent<T>(remove(key)); });
 		return 0;
 	}
 
@@ -195,9 +204,10 @@ public:
 	 * Clear the tree and deallocate all entries.
 	 */
 	int
-	clear() {
+	clear()
+	{
 		auto pop = nvml::pool_by_vptr(this);
-				nvobj::transaction::exec_tx(pop, [&]{
+		nvobj::transaction::exec_tx(pop, [&] {
 			if (root->inode) {
 				root->inode->clear();
 				nvobj::delete_persistent<node>(root->inode);
@@ -219,7 +229,8 @@ public:
 	 * @return The value if it is in the tree, nullptr otherwise.
 	 */
 	value_type
-	get(key_type key) {
+	get(key_type key)
+	{
 		auto ret = get_leaf(key, nullptr);
 
 		return ret ? ret->value : nullptr;
@@ -233,7 +244,8 @@ public:
 	 * @return 0 on
 	 */
 	int
-	lookup(key_type key) {
+	lookup(key_type key)
+	{
 		return get(key) != nullptr;
 	}
 
@@ -245,8 +257,8 @@ public:
 	 *
 	 * @return 0 if tree empty, clb return value otherwise.
 	 */
-	int
-	foreach(callback clb, void *args) {
+	int foreach (callback clb, void *args)
+	{
 		if (is_empty())
 			return 0;
 
@@ -259,7 +271,8 @@ public:
 	 * @return 1 if empty, 0 otherwise.
 	 */
 	int
-	is_empty() {
+	is_empty()
+	{
 		return root->value == nullptr && root->inode == nullptr;
 	}
 
@@ -269,7 +282,8 @@ public:
 	 * @return 0 on success, negative values on error.
 	 */
 	int
-	check() {
+	check()
+	{
 		return 0;
 	}
 
@@ -279,24 +293,28 @@ public:
 	~ctree_map_p() = default;
 
 private:
-
 	struct node;
 
 	/*
 	 * Entry holding the value.
 	 */
 	struct entry {
-		entry() : key(0), inode(nullptr), value(nullptr) {}
+		entry() : key(0), inode(nullptr), value(nullptr)
+		{
+		}
 
-		entry(key_type _key, value_type _value) : key(_key),
-				inode(nullptr), value(_value) {}
+		entry(key_type _key, value_type _value)
+		    : key(_key), inode(nullptr), value(_value)
+		{
+		}
 
 		nvobj::p<key_type> key;
 		nvobj::persistent_ptr<node> inode;
 		value_type value;
 
 		void
-		clear() {
+		clear()
+		{
 			if (inode) {
 				inode->clear();
 				nvobj::delete_persistent<node>(inode);
@@ -305,14 +323,14 @@ private:
 			nvobj::delete_persistent<T>(value);
 			value = nullptr;
 		}
-
 	};
 
 	/*
 	 * Internal node pointing to two entries.
 	 */
 	struct node {
-		node() : diff(0) {
+		node() : diff(0)
+		{
 			entries[0] = nullptr;
 			entries[1] = nullptr;
 		}
@@ -321,7 +339,8 @@ private:
 		nvobj::persistent_ptr<entry> entries[2];
 
 		void
-		clear() {
+		clear()
+		{
 			if (entries[0]) {
 				entries[0]->clear();
 				nvobj::delete_persistent<entry>(entries[0]);
@@ -333,7 +352,6 @@ private:
 				entries[1] = nullptr;
 			}
 		}
-
 	};
 
 	/*
@@ -349,7 +367,8 @@ private:
 	 * Insert leaf into the tree.
 	 */
 	void
-	insert_leaf(const entry *e, int diff) {
+	insert_leaf(const entry *e, int diff)
+	{
 		auto new_node = nvobj::make_persistent<node>();
 		new_node->diff = diff;
 
@@ -365,7 +384,8 @@ private:
 			dest_entry = n->entries[BIT_IS_SET(e->key, n->diff)];
 		}
 
-		new_node->entries[!d] = nvobj::make_persistent<entry>(*dest_entry);
+		new_node->entries[!d] =
+			nvobj::make_persistent<entry>(*dest_entry);
 		dest_entry->key = 0;
 		dest_entry->inode = new_node;
 		dest_entry->value = nullptr;
@@ -375,7 +395,8 @@ private:
 	 * Fetch leaf from the tree.
 	 */
 	nvobj::persistent_ptr<entry>
-	get_leaf(uint64_t key, nvobj::persistent_ptr<entry> *parent) {
+	get_leaf(uint64_t key, nvobj::persistent_ptr<entry> *parent)
+	{
 		auto n = root;
 		nvobj::persistent_ptr<entry> p = nullptr;
 
@@ -398,7 +419,9 @@ private:
 	 * Recursive foreach on nodes.
 	 */
 	int
-	foreach_node(const nvobj::persistent_ptr<entry> e, callback clb, void *arg) {
+	foreach_node(const nvobj::persistent_ptr<entry> e, callback clb,
+		     void *arg)
+	{
 		int ret = 0;
 
 		if (e->inode != nullptr) {
@@ -416,6 +439,6 @@ private:
 	nvobj::persistent_ptr<entry> root;
 };
 
-}  /* namespace examples */
+} /* namespace examples */
 
 #endif /* EXAMPLES_CTREE_MAP_PERSISTENT_HPP */

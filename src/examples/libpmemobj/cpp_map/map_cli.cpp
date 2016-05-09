@@ -30,12 +30,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <libpmemobj/pool.hpp>
 #include <ctree_map_persistent.hpp>
 #include <ctree_map_volatile.hpp>
+#include <iostream>
+#include <libpmemobj/pool.hpp>
 #include <memory>
 #include <unistd.h>
-#include <iostream>
 
 namespace
 {
@@ -66,8 +66,9 @@ enum queue_op {
 };
 
 /* queue operations strings */
-const char *ops_str[MAX_QUEUE_OP] = {"", "insert", "insert_new", "get",
-		"remove","remove_free", "clear", "print"};
+const char *ops_str[MAX_QUEUE_OP] = {"",      "insert", "insert_new",
+				     "get",   "remove", "remove_free",
+				     "clear", "print"};
 
 /*
  * parse_queue_op -- parses the operation string and returns matching queue_op
@@ -82,8 +83,6 @@ parse_queue_op(const char *str)
 	return UNKNOWN_QUEUE_OP;
 }
 
-
-
 struct root {
 	persistent_ptr<pmap> ptree;
 };
@@ -91,9 +90,10 @@ struct root {
 /*
  * printer -- (internal) print the value for the given key
  */
-template<typename T>
+template <typename T>
 int
-printer(key_type key, T value, void *){
+printer(key_type key, T value, void *)
+{
 	std::cout << "map[" << key << "] = " << *value << std::endl;
 	return 0;
 }
@@ -101,9 +101,10 @@ printer(key_type key, T value, void *){
 /*
  * insert -- (internal) insert value into the map
  */
-template<typename T>
+template <typename T>
 void
-insert(nvobj::pool_base pop, T &map, char *argv[], int &argn) {
+insert(nvobj::pool_base pop, T &map, char *argv[], int &argn)
+{
 	map->insert(atoll(argv[argn]), new value_t(atoll(argv[argn + 1])));
 	argn += 2;
 }
@@ -111,9 +112,10 @@ insert(nvobj::pool_base pop, T &map, char *argv[], int &argn) {
 /*
  * remove -- (internal) remove value from map
  */
-template<typename T>
+template <typename T>
 void
-remove(nvobj::pool_base pop, T &map, char *argv[], int &argn) {
+remove(nvobj::pool_base pop, T &map, char *argv[], int &argn)
+{
 	auto val = map->remove(atoll(argv[argn++]));
 	if (val) {
 		std::cout << *val << std::endl;
@@ -126,18 +128,17 @@ remove(nvobj::pool_base pop, T &map, char *argv[], int &argn) {
 /*
  * remove -- (internal) remove specialization for persistent ctree
  */
-template<>
+template <>
 void
 remove<persistent_ptr<pmap>>(nvobj::pool_base pop, persistent_ptr<pmap> &map,
-		char *argv[], int &argn) {
+			     char *argv[], int &argn)
+{
 	auto val = map->remove(atoll(argv[argn++]));
 	if (val) {
 		std::cout << *val << std::endl;
-		nvobj::transaction::exec_tx(pop, [&] {
-			delete_persistent<value_t>(val);
-		});
-	}
-	else{
+		nvobj::transaction::exec_tx(
+			pop, [&] { delete_persistent<value_t>(val); });
+	} else {
 		std::cout << "Entry not found\n";
 	}
 }
@@ -145,13 +146,14 @@ remove<persistent_ptr<pmap>>(nvobj::pool_base pop, persistent_ptr<pmap> &map,
 /*
  * insert -- (internal) insert specialization for persistent ctree
  */
-template<>
+template <>
 void
 insert<persistent_ptr<pmap>>(nvobj::pool_base pop, persistent_ptr<pmap> &map,
-		char *argv[], int &argn) {
+			     char *argv[], int &argn)
+{
 	nvobj::transaction::exec_tx(pop, [&] {
 		map->insert(atoll(argv[argn]),
-				make_persistent<value_t>(atoll(argv[argn + 1])));
+			    make_persistent<value_t>(atoll(argv[argn + 1])));
 	});
 	argn += 2;
 }
@@ -159,12 +161,14 @@ insert<persistent_ptr<pmap>>(nvobj::pool_base pop, persistent_ptr<pmap> &map,
 /*
  * exec_op -- (internal) execute single operation
  */
-template<typename K, typename T>
+template <typename K, typename T>
 void
-exec_op(nvobj::pool_base pop, T &map, queue_op op, char *argv[], int &argn) {
+exec_op(nvobj::pool_base pop, T &map, queue_op op, char *argv[], int &argn)
+{
 	switch (op) {
 		case MAP_INSERT_NEW:
-			map->insert_new(atoll(argv[argn]), atoll(argv[argn + 1]));
+			map->insert_new(atoll(argv[argn]),
+					atoll(argv[argn + 1]));
 			argn += 2;
 			break;
 		case MAP_INSERT:
@@ -188,14 +192,13 @@ exec_op(nvobj::pool_base pop, T &map, queue_op op, char *argv[], int &argn) {
 			map->clear();
 			break;
 		case MAP_PRINT:
-			map->foreach(printer<typename K::value_type>, 0);
+			map->foreach (printer<typename K::value_type>, 0);
 			break;
 		default:
 			throw std::invalid_argument("invalid queue operation");
 			break;
 	}
 }
-
 }
 
 int
@@ -203,8 +206,10 @@ main(int argc, char *argv[])
 {
 	if (argc < 4) {
 		std::cerr << "usage: " << argv[0]
-			  << " file-name <persistent|volatile> [insert|insert_new "
-					  "<key value>|get <key>|remove <key> | remove_free <key>]"
+			  << " file-name <persistent|volatile> "
+			     "[insert|insert_new "
+			     "<key value>|get <key>|remove <key> | remove_free "
+			     "<key>]"
 			  << std::endl;
 		return 1;
 	}
@@ -216,16 +221,15 @@ main(int argc, char *argv[])
 
 	if (access(path.c_str(), F_OK) != 0) {
 		pop = pool<root>::create(path, LAYOUT, PMEMOBJ_MIN_POOL,
-					       S_IRWXU);
+					 S_IRWXU);
 	} else {
 		pop = pool<root>::open(path, LAYOUT);
 	}
 
 	auto q = pop.get_root();
 	if (!q->ptree) {
-		nvobj::transaction::exec_tx(pop, [&] {
-					q->ptree = make_persistent<pmap>();
-		});
+		nvobj::transaction::exec_tx(
+			pop, [&] { q->ptree = make_persistent<pmap>(); });
 	}
 
 	auto vtree = std::make_shared<vmap>();

@@ -34,35 +34,34 @@
 #define LIBPMEMOBJ_UTILS_HPP
 
 #include "libpmemobj.h"
-#include "libpmemobj/persistent_ptr.hpp"
 #include "libpmemobj/detail/pexceptions.hpp"
+#include "libpmemobj/persistent_ptr.hpp"
 
-namespace nvml {
+namespace nvml
+{
 
-	template<typename T>
-	inline obj::pool_base
-	pool_by_vptr(const T *that)
-	{
-		auto pop = pmemobj_pool_by_ptr(that);
-		if (!pop)
-			throw pool_error("Object not in an open pool.");
+template <typename T>
+inline obj::pool_base
+pool_by_vptr(const T *that)
+{
+	auto pop = pmemobj_pool_by_ptr(that);
+	if (!pop)
+		throw pool_error("Object not in an open pool.");
 
-		return obj::pool_base(pop);
-	}
+	return obj::pool_base(pop);
+}
 
-	template<typename T>
-	inline obj::pool_base
-	pool_by_pptr(const obj::persistent_ptr<T> ptr)
-	{
-		auto pop = pmemobj_pool_by_oid(ptr.raw());
-		if (!pop)
-			throw pool_error("Object not in an open pool.");
+template <typename T>
+inline obj::pool_base
+pool_by_pptr(const obj::persistent_ptr<T> ptr)
+{
+	auto pop = pmemobj_pool_by_oid(ptr.raw());
+	if (!pop)
+		throw pool_error("Object not in an open pool.");
 
-		return obj::pool_base(pop);
-	}
+	return obj::pool_base(pop);
+}
 
-}  /* namespace nvml */
-
-
+} /* namespace nvml */
 
 #endif /* LIBPMEMOBJ_UTILS_HPP */

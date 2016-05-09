@@ -33,12 +33,13 @@
 #ifndef EXAMPLES_CTREE_MAP_VOLATILE_HPP
 #define EXAMPLES_CTREE_MAP_VOLATILE_HPP
 #include <cstdint>
-#include <stdlib.h>
 #include <functional>
+#include <stdlib.h>
 
-#define	BIT_IS_SET(n, i) (!!((n) & (1ULL << (i))))
+#define BIT_IS_SET(n, i) (!!((n) & (1ULL << (i))))
 
-namespace examples {
+namespace examples
+{
 
 /**
  * C++ implementation of a volatile ctree.
@@ -48,7 +49,6 @@ namespace examples {
 template <typename K, typename T>
 class ctree_map_volatile {
 public:
-
 	/** Convenience typedef for the key type. */
 	typedef K key_type;
 
@@ -61,7 +61,9 @@ public:
 	/**
 	 * Detault constructor.
 	 */
-	ctree_map_volatile() : root(new entry()) {}
+	ctree_map_volatile() : root(new entry())
+	{
+	}
 
 	/**
 	 * Insert or update the given value under the given key.
@@ -74,7 +76,8 @@ public:
 	 * @return 0 on success, negative values on error.
 	 */
 	int
-	insert(uint64_t key, value_type value) {
+	insert(uint64_t key, value_type value)
+	{
 		auto dest_entry = root;
 		while (dest_entry->inode != nullptr) {
 			auto n = dest_entry->inode;
@@ -86,7 +89,8 @@ public:
 			delete dest_entry->value;
 			*dest_entry = e;
 		} else {
-			insert_leaf(&e, ctree_map_volatile::find_crit_bit(dest_entry->key, key));
+			insert_leaf(&e, ctree_map_volatile::find_crit_bit(
+						dest_entry->key, key));
 		}
 
 		return 0;
@@ -103,9 +107,10 @@ public:
 	 *
 	 * @return 0 on success, negative values on error.
 	 */
-	template<typename ...Args>
+	template <typename... Args>
 	int
-	insert_new(key_type key,const Args &...args) {
+	insert_new(key_type key, const Args &... args)
+	{
 		return insert(key, new T(args...));
 	}
 
@@ -119,7 +124,8 @@ public:
 	 * @return The value if it is in the tree, nullptr otherwise.
 	 */
 	value_type
-	remove(key_type key) {
+	remove(key_type key)
+	{
 		entry *parent = nullptr;
 		auto leaf = get_leaf(key, &parent);
 
@@ -133,7 +139,8 @@ public:
 			leaf->value = nullptr;
 		} else {
 			auto n = parent->inode;
-			*parent = *(n->entries[parent->inode->entries[0]->key == leaf->key]);
+			*parent = *(n->entries[parent->inode->entries[0]->key ==
+					       leaf->key]);
 
 			/* cleanup both entries and the unnecessary node */
 			delete n->entries[0];
@@ -152,7 +159,8 @@ public:
 	 * @return 0 on success, negative values on error.
 	 */
 	int
-	remove_free(key_type key) {
+	remove_free(key_type key)
+	{
 		delete remove(key);
 		return 0;
 	}
@@ -161,7 +169,8 @@ public:
 	 * Clear the tree and deallocate all entries.
 	 */
 	int
-	clear() {
+	clear()
+	{
 		if (root->inode) {
 			root->inode->clear();
 			delete root->inode;
@@ -182,7 +191,8 @@ public:
 	 * @return The value if it is in the tree, nullptr otherwise.
 	 */
 	value_type
-	get(key_type key) {
+	get(key_type key)
+	{
 		auto ret = get_leaf(key, nullptr);
 
 		return ret ? ret->value : nullptr;
@@ -196,7 +206,8 @@ public:
 	 * @return 0 on
 	 */
 	int
-	lookup(key_type key) {
+	lookup(key_type key)
+	{
 		return get(key) != nullptr;
 	}
 
@@ -208,8 +219,8 @@ public:
 	 *
 	 * @return 0 if tree empty, clb return value otherwise.
 	 */
-	int
-	foreach(callback clb, void *args) {
+	int foreach (callback clb, void *args)
+	{
 		if (is_empty())
 			return 0;
 
@@ -222,7 +233,8 @@ public:
 	 * @return 1 if empty, 0 otherwise.
 	 */
 	int
-	is_empty() {
+	is_empty()
+	{
 		return root->value == nullptr && root->inode == nullptr;
 	}
 
@@ -232,30 +244,35 @@ public:
 	 * @return 0 on success, negative values on error.
 	 */
 	int
-	check() {
+	check()
+	{
 		return 0;
 	}
 
 	/**
 	 * Destructor.
 	 */
-	~ctree_map_volatile() {
+	~ctree_map_volatile()
+	{
 		clear();
 		delete root;
 	}
 
 private:
-
 	struct node;
 
 	/*
 	 * Entry holding the value.
 	 */
 	struct entry {
-		entry() : key(0), inode(nullptr), value(nullptr) {}
+		entry() : key(0), inode(nullptr), value(nullptr)
+		{
+		}
 
-		entry(key_type _key, value_type _value) : key(_key),
-				inode(nullptr), value(_value) {}
+		entry(key_type _key, value_type _value)
+		    : key(_key), inode(nullptr), value(_value)
+		{
+		}
 
 		key_type key;
 		node *inode;
@@ -265,21 +282,22 @@ private:
 		 * Clear the entry.
 		 */
 		void
-		clear() {
+		clear()
+		{
 			if (inode) {
 				inode->clear();
 				delete inode;
 			}
 			delete value;
 		}
-
 	};
 
 	/*
 	 * Internal node pointing to two entries.
 	 */
 	struct node {
-		node() : diff(0) {
+		node() : diff(0)
+		{
 			entries[0] = nullptr;
 			entries[1] = nullptr;
 		}
@@ -291,7 +309,8 @@ private:
 		 * Clear the node.
 		 */
 		void
-		clear() {
+		clear()
+		{
 			if (entries[0]) {
 				entries[0]->clear();
 				delete entries[0];
@@ -301,7 +320,6 @@ private:
 				delete entries[1];
 			}
 		}
-
 	};
 
 	/*
@@ -317,7 +335,8 @@ private:
 	 * Insert leaf into the tree.
 	 */
 	void
-	insert_leaf(const entry *e, int diff) {
+	insert_leaf(const entry *e, int diff)
+	{
 		auto new_node = new node();
 		new_node->diff = diff;
 
@@ -343,7 +362,8 @@ private:
 	 * Fetch leaf from the tree.
 	 */
 	entry *
-	get_leaf(uint64_t key, entry **parent) {
+	get_leaf(uint64_t key, entry **parent)
+	{
 		auto n = root;
 		entry *p = nullptr;
 
@@ -366,7 +386,8 @@ private:
 	 * Recursive foreach on nodes.
 	 */
 	int
-	foreach_node(const entry *e, callback clb, void *arg) {
+	foreach_node(const entry *e, callback clb, void *arg)
+	{
 		int ret = 0;
 
 		if (e->inode != nullptr) {
@@ -384,6 +405,6 @@ private:
 	entry *root;
 };
 
-}  /* namespace examples */
+} /* namespace examples */
 
 #endif /* EXAMPLES_CTREE_MAP_VOLATILE_HPP */
