@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/tomaszkapela/nvml.png?label=ready&title=Ready)](https://waffle.io/tomaszkapela/nvml)
 nvml: Linux NVM Library
 =======================
 
